@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Atelier Noir — Maison de Couture</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,700;1,6..96,400&family=Manrope:wght@300;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="cursor" id="cursor" aria-hidden="true"><span id="cursorLabel"></span></div>
+  <div class="intro" id="intro" aria-hidden="true"><span>A</span><span>N</span></div>
+
+  <header class="nav">
+    <span>Paris — Milano</span>
+    <a href="#" class="mark">ATELIER NOIR</a>
+    <a href="#rdv" class="nav-link" data-cursor="Book">Appointment</a>
+  </header>
+
+  <section class="hero">
+    <h1 class="split">The art<br /><em>of less.</em></h1>
+    <p class="hero-sub">Maison de couture · Established 1987</p>
+    <div class="scroll-cue">Scroll</div>
+  </section>
+
+  <section class="manifesto">
+    <p class="big-quote" id="quote">We do not dress bodies. We dress silences, gestures and the space between them.</p>
+  </section>
+
+  <div id="collections"></div>
+
+  <section id="rdv" class="rdv">
+    <div class="rdv-head">
+      <p class="label">By appointment only</p>
+      <h2>Rendez-vous<br /><em>at the Maison</em></h2>
+    </div>
+    <form id="rdvForm" class="rdv-form">
+      <div class="field"><label>Service</label><div class="services" id="services"></div></div>
+      <div class="field"><label>Date</label><div class="days" id="days"></div></div>
+      <div class="field"><label>Hour</label><div class="slots" id="slots"><span class="muted">Choose a date first</span></div></div>
+      <div class="row">
+        <div class="field"><label for="name">Name</label><input id="name" name="name" required maxlength="80" /></div>
+        <div class="field"><label for="email">Email</label><input id="email" name="email" type="email" required maxlength="120" /></div>
+      </div>
+      <div class="field"><label for="note">A note for the atelier</label><textarea id="note" name="note" maxlength="400" rows="3"></textarea></div>
+      <button type="submit" class="cta" data-cursor="Reserve">Request appointment <span>→</span></button>
+      <p class="confirm" id="confirm" role="status"></p>
+    </form>
+  </section>
+
+  <footer class="footer">
+    <div class="huge">NOIR</div>
+    <div class="foot-row"><span>12 Rue du Silence, Paris</span><span>© 2026 Atelier Noir</span></div>
+  </footer>
+  <script src="app.js"></script>
+</body>
+</html>

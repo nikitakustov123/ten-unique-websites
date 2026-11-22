@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Paper Kitchen — a handwritten recipe book</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Patrick+Hand&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="masthead">
+    <svg class="doodle whisk" viewBox="0 0 120 120" aria-hidden="true"><path d="M60 110 L60 70 M60 70 C30 50 30 10 60 10 C90 10 90 50 60 70 M60 70 C45 50 45 15 60 10 M60 70 C75 50 75 15 60 10" /></svg>
+    <h1>Paper <span>Kitchen</span></h1>
+    <p class="tagline">recipes scribbled, splattered &amp; shared with love</p>
+    <svg class="doodle underline" viewBox="0 0 400 30" aria-hidden="true"><path d="M5 20 C80 5 160 28 240 12 S360 8 395 18" /></svg>
+    <svg class="doodle spoon" viewBox="0 0 120 120" aria-hidden="true"><path d="M30 100 L75 55 M75 55 C70 35 85 15 100 20 C110 30 95 55 75 55" /></svg>
+  </header>
+
+  <nav class="toolbar">
+    <input id="q" type="search" placeholder="search by dish or ingredient…" />
+    <div class="tags" id="tags"></div>
+    <select id="sort" aria-label="Sort">
+      <option value="new">newest</option>
+      <option value="top">best rated</option>
+      <option value="quick">quickest</option>
+    </select>
+    <button class="sticker" id="newBtn">✎ add your recipe</button>
+  </nav>
+
+  <main class="pinboard" id="board"></main>
+
+  <div class="book" id="book" hidden>
+    <article class="page" id="page"></article>
+  </div>
+
+  <dialog id="newDlg">
+    <form id="newForm" class="notepad">
+      <h2>A new recipe card</h2>
+      <div class="two"><input name="title" placeholder="Recipe name" required maxlength="100" /><input name="emoji" placeholder="🍲" maxlength="8" class="emoji-in" /></div>
+      <input name="summary" placeholder="One line about it" required maxlength="200" />
+      <div class="three">
+        <label>minutes<input name="minutes" type="number" min="1" max="1440" value="30" required /></label>
+        <label>serves<input name="servings" type="number" min="1" max="24" value="4" required /></label>
+        <label>category<select name="tag" id="tagSelect"></select></label>
+      </div>
+      <input name="author" placeholder="Your name" maxlength="50" />
+      <h3>Ingredients</h3>
+      <div id="ingRows"></div>
+      <button type="button" class="link" id="addIng">+ another ingredient</button>
+      <h3>Steps</h3>
+      <div id="stepRows"></div>
+      <button type="button" class="link" id="addStep">+ another step</button>
+      <div class="actions"><button type="button" class="link" id="cancelNew">cancel</button><button type="submit" class="sticker">pin it to the board</button></div>
+    </form>
+  </dialog>
+
+  <footer class="foot">made with flour on our hands · © 2026 Paper Kitchen</footer>
+  <div class="toast" id="toast"></div>
+  <script src="app.js"></script>
+</body>
+</html>

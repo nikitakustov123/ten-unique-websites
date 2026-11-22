@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SYNTHWAVE FM — 84.0 · Broadcasting from 1984</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Monoton&family=Audiowide&family=Rajdhani:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="scene" aria-hidden="true">
+    <div class="sky"></div>
+    <div class="sun"></div>
+    <div class="mountains"></div>
+    <div class="grid-floor"><div class="grid-lines"></div></div>
+  </div>
+
+  <header class="top">
+    <h1 class="logo">SYNTHWAVE<span>FM</span></h1>
+    <p class="freq">84.0 MHz · <span id="listeners">…</span> listening</p>
+  </header>
+
+  <section class="player">
+    <div class="deck">
+      <button class="play" id="playBtn" aria-label="Play">▶</button>
+      <div class="np">
+        <p class="label"><span class="live-dot"></span> ON AIR · <b id="showTitle">…</b> with <b id="showHost">…</b></p>
+        <p class="track" id="trackLine">Press play to tune in</p>
+        <p class="ded" id="dedication"></p>
+      </div>
+      <input type="range" id="volume" min="0" max="1" step="0.01" value="0.5" aria-label="Volume" />
+    </div>
+    <canvas id="viz" width="900" height="140" aria-hidden="true"></canvas>
+  </section>
+
+  <main class="panels">
+    <section class="panel">
+      <h2>REQUEST LINE</h2>
+      <form id="reqForm" class="req-form">
+        <input name="artist" placeholder="Artist" maxlength="80" required />
+        <input name="title" placeholder="Track" maxlength="100" required />
+        <input name="requested_by" placeholder="Your handle" maxlength="30" />
+        <input name="dedication" placeholder="Dedication (optional)" maxlength="140" />
+        <button class="btn" type="submit">SEND REQUEST</button>
+      </form>
+      <ol class="queue" id="queue"></ol>
+      <button class="btn ghost" id="djNext" title="DJ booth: mark top request as played">⏭ DJ: PLAY TOP REQUEST</button>
+    </section>
+
+    <section class="panel">
+      <h2>TODAY'S SCHEDULE</h2>
+      <ul class="schedule" id="schedule"></ul>
+    </section>
+  </main>
+
+  <footer class="foot">BROADCASTING NEON SINCE 1984 · © 2026 SYNTHWAVE FM</footer>
+  <div class="toast" id="toast"></div>
+  <script src="app.js"></script>
+</body>
+</html>

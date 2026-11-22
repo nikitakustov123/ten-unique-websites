@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>~/terminal-jobs — dev jobs for people who live in the shell</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="scan" aria-hidden="true"></div>
+  <div class="layout">
+    <div class="window">
+      <div class="titlebar">
+        <span class="dots"><i></i><i></i><i></i></span>
+        <span class="title">guest@terminal-jobs: ~</span>
+        <span class="clock" id="clock"></span>
+      </div>
+      <div class="screen" id="screen" tabindex="0">
+        <div id="out" aria-live="polite"></div>
+        <form class="prompt-line" id="promptForm" autocomplete="off">
+          <label for="cmd" id="ps1"><span class="u">guest</span>@<span class="h">jobs</span>:<span class="p">~</span>$</label>
+          <input id="cmd" spellcheck="false" autocapitalize="off" />
+        </form>
+      </div>
+    </div>
+
+    <aside class="side">
+      <h2>// quick commands</h2>
+      <div class="quick" id="quick">
+        <button data-cmd="help">help</button>
+        <button data-cmd="ls">ls</button>
+        <button data-cmd="ls --remote">ls --remote</button>
+        <button data-cmd="search react">search react</button>
+        <button data-cmd="stats">stats</button>
+        <button data-cmd="post">post</button>
+        <button data-cmd="matrix">matrix</button>
+        <button data-cmd="clear">clear</button>
+      </div>
+      <h2>// latest jobs</h2>
+      <ul class="mini" id="mini"></ul>
+    </aside>
+  </div>
+  <canvas id="matrix" aria-hidden="true"></canvas>
+  <script src="app.js"></script>
+</body>
+</html>

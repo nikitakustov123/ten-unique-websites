@@ -1,0 +1,28 @@
+{
+  "name": "ten-unique-websites",
+  "version": "1.0.0",
+  "private": true,
+  "description": "10 unique full-stack websites: Node.js + Express + SQLite, each with its own visual style and animations",
+  "type": "module",
+  "engines": {
+    "node": ">=22.13.0"
+  },
+  "workspaces": [
+    "sites/*"
+  ],
+  "scripts": {
+    "start": "node scripts/start-all.js",
+    "start:01": "npm start -w sites/01-ember-roastery",
+    "start:02": "npm start -w sites/02-brutal-notes",
+    "start:03": "npm start -w sites/03-orbit-voyages",
+    "start:04": "npm start -w sites/04-verdant",
+    "start:05": "npm start -w sites/05-pixel-arcade",
+    "start:06": "npm start -w sites/06-atelier-noir",
+    "start:07": "npm start -w sites/07-synthwave-fm",
+    "start:08": "npm start -w sites/08-glass-ledger",
+    "start:09": "npm start -w sites/09-paper-kitchen",
+    "start:10": "npm start -w sites/10-terminal-jobs",
+    "reset-db": "node scripts/reset-db.js",
+    "test": "node scripts/smoke-test.js"
+  }
+}

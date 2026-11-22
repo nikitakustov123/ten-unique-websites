@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>PIXEL ARCADE — Insert coin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="crt" aria-hidden="true"></div>
+
+  <header class="marquee-sign">
+    <h1 class="logo">PIXEL<span>ARCADE</span></h1>
+    <p class="blink">▶ INSERT COIN ◀</p>
+    <ul class="stats" id="stats"></ul>
+  </header>
+
+  <main class="cabinet-row">
+    <section class="cabinet">
+      <div class="screen-bezel">
+        <div class="hud">
+          <span>GAME: <b id="gameName">NEON SNAKE</b></span>
+          <span>SCORE: <b id="score">0</b></span>
+          <span>HI: <b id="hi">0</b></span>
+        </div>
+        <canvas id="game" width="480" height="480" tabindex="0" aria-label="Game screen"></canvas>
+        <div class="overlay" id="overlay">
+          <p class="big" id="ovTitle">NEON SNAKE</p>
+          <p id="ovText">ARROWS / WASD TO MOVE</p>
+          <button class="btn" id="startBtn">PRESS START</button>
+        </div>
+        <form class="initials" id="initialsForm" hidden>
+          <p class="big">NEW SCORE!</p>
+          <p>ENTER YOUR INITIALS</p>
+          <input name="initials" maxlength="3" required autocomplete="off" pattern="[A-Za-z0-9!?]{3}" />
+          <button class="btn" type="submit">SAVE</button>
+          <button class="btn ghost" type="button" id="skipBtn">SKIP</button>
+        </form>
+      </div>
+      <div class="controls">
+        <button class="pad-btn sel" data-game="snake">🐍 SNAKE</button>
+        <button class="pad-btn" data-game="reflex">🎯 REFLEX</button>
+      </div>
+      <div class="dpad" aria-label="Touch controls">
+        <button data-dir="up">▲</button><button data-dir="left">◀</button><button data-dir="down">▼</button><button data-dir="right">▶</button>
+      </div>
+    </section>
+
+    <aside class="board">
+      <h2>HIGH SCORES</h2>
+      <div class="board-tabs">
+        <button class="tab on" data-board="snake">SNAKE</button>
+        <button class="tab" data-board="reflex">REFLEX</button>
+      </div>
+      <ol id="leaderboard"></ol>
+      <p class="hint">TOP 10 ARE STORED IN THE ARCADE DATABASE.<br />NO CHEATING — THE SERVER IS WATCHING 👁</p>
+    </aside>
+  </main>
+
+  <footer class="foot">© 2026 PIXEL ARCADE · 1 CREDIT = 1 SMILE</footer>
+  <script src="app.js"></script>
+</body>
+</html>

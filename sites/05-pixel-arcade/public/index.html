@@ -1,12 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>PIXEL ARCADE — Insert coin</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet" />
+  <title>PIXEL ARCADE — бросьте монетку</title>
+  <link rel="stylesheet" href="fonts/fonts.css" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -14,7 +12,7 @@
 
   <header class="marquee-sign">
     <h1 class="logo">PIXEL<span>ARCADE</span></h1>
-    <p class="blink">▶ INSERT COIN ◀</p>
+    <p class="blink">▶ БРОСЬТЕ МОНЕТКУ ◀</p>
     <ul class="stats" id="stats"></ul>
   </header>
 
@@ -22,45 +20,45 @@
     <section class="cabinet">
       <div class="screen-bezel">
         <div class="hud">
-          <span>GAME: <b id="gameName">NEON SNAKE</b></span>
-          <span>SCORE: <b id="score">0</b></span>
-          <span>HI: <b id="hi">0</b></span>
+          <span>ИГРА: <b id="gameName">НЕОНОВАЯ ЗМЕЙКА</b></span>
+          <span>СЧЁТ: <b id="score">0</b></span>
+          <span>РЕКОРД: <b id="hi">0</b></span>
         </div>
-        <canvas id="game" width="480" height="480" tabindex="0" aria-label="Game screen"></canvas>
+        <canvas id="game" width="480" height="480" tabindex="0" aria-label="Игровой экран"></canvas>
         <div class="overlay" id="overlay">
-          <p class="big" id="ovTitle">NEON SNAKE</p>
-          <p id="ovText">ARROWS / WASD TO MOVE</p>
-          <button class="btn" id="startBtn">PRESS START</button>
+          <p class="big" id="ovTitle">НЕОНОВАЯ ЗМЕЙКА</p>
+          <p id="ovText">СТРЕЛКИ / WASD — ДВИЖЕНИЕ</p>
+          <button class="btn" id="startBtn">СТАРТ</button>
         </div>
         <form class="initials" id="initialsForm" hidden>
-          <p class="big">NEW SCORE!</p>
-          <p>ENTER YOUR INITIALS</p>
-          <input name="initials" maxlength="3" required autocomplete="off" pattern="[A-Za-z0-9!?]{3}" />
-          <button class="btn" type="submit">SAVE</button>
-          <button class="btn ghost" type="button" id="skipBtn">SKIP</button>
+          <p class="big">НОВЫЙ РЕКОРД!</p>
+          <p>ВВЕДИТЕ ИНИЦИАЛЫ</p>
+          <input name="initials" maxlength="3" required autocomplete="off" pattern="[A-Za-zА-Яа-яЁё0-9!?]{3}" />
+          <button class="btn" type="submit">СОХРАНИТЬ</button>
+          <button class="btn ghost" type="button" id="skipBtn">ПРОПУСТИТЬ</button>
         </form>
       </div>
       <div class="controls">
-        <button class="pad-btn sel" data-game="snake">🐍 SNAKE</button>
-        <button class="pad-btn" data-game="reflex">🎯 REFLEX</button>
+        <button class="pad-btn sel" data-game="snake">🐍 ЗМЕЙКА</button>
+        <button class="pad-btn" data-game="reflex">🎯 РЕФЛЕКС</button>
       </div>
-      <div class="dpad" aria-label="Touch controls">
+      <div class="dpad" aria-label="Сенсорное управление">
         <button data-dir="up">▲</button><button data-dir="left">◀</button><button data-dir="down">▼</button><button data-dir="right">▶</button>
       </div>
     </section>
 
     <aside class="board">
-      <h2>HIGH SCORES</h2>
+      <h2>РЕКОРДЫ</h2>
       <div class="board-tabs">
-        <button class="tab on" data-board="snake">SNAKE</button>
-        <button class="tab" data-board="reflex">REFLEX</button>
+        <button class="tab on" data-board="snake">ЗМЕЙКА</button>
+        <button class="tab" data-board="reflex">РЕФЛЕКС</button>
       </div>
       <ol id="leaderboard"></ol>
-      <p class="hint">TOP 10 ARE STORED IN THE ARCADE DATABASE.<br />NO CHEATING — THE SERVER IS WATCHING 👁</p>
+      <p class="hint">ТОП-10 ХРАНИТСЯ В БАЗЕ ДАННЫХ АРКАДЫ.<br />БЕЗ ЧИТОВ — СЕРВЕР ВСЁ ВИДИТ 👁</p>
     </aside>
   </main>
 
-  <footer class="foot">© 2026 PIXEL ARCADE · 1 CREDIT = 1 SMILE</footer>
+  <footer class="foot">© 2026 PIXEL ARCADE · 1 КРЕДИТ = 1 УЛЫБКА</footer>
   <script src="app.js"></script>
 </body>
 </html>

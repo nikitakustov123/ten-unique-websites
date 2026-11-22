@@ -1,5 +1,5 @@
-// Smoke test: boots every site on a temporary port with a fresh database and exercises its main API flows.
-// Usage: npm test
+// Smoke-тест: поднимает каждый сайт на временном порту со свежей БД и прогоняет основные сценарии API.
+// Запуск: npm test
 import { spawn } from 'node:child_process';
 import { rmSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
@@ -28,11 +28,12 @@ const TESTS = {
     check(o.status === 201 && o.data.total_cents === p.data[0].price_cents * 2, 'order total computed server-side');
     check((await r('GET', `/api/orders/${o.data.id}`)).data.items.length === 1, 'order retrievable');
     check((await r('POST', '/api/orders', { customer: 'x', email: 'bad', pickup_time: '10:00', items: [] })).status === 400, 'invalid order rejected');
-    check((await r('POST', '/api/reviews', { author: 'T', rating: 5, body: 'Lovely coffee' })).status === 201, 'review created');
+    check((await r('POST', '/api/reviews', { author: 'Т', rating: 5, body: 'Чудесный кофе' })).status === 201, 'review created');
   },
   '02-brutal-notes': async (r) => {
-    const c = await r('POST', '/api/notes', { title: 'Test', body: 'x', color: 'pink', tags: ['qa', 'Work'] });
-    check(c.status === 201 && c.data.tags.includes('qa'), 'note created with tags');
+    const c = await r('POST', '/api/notes', { title: 'Тест', body: 'x', color: 'pink', tags: ['qa', 'Работа'] });
+    check(c.status === 201 && c.data.tags.includes('работа'), 'note created with Cyrillic tags');
+    check((await r('GET', '/api/notes?q=ТЕСТ')).data.length === 1, 'case-insensitive Cyrillic search');
     check((await r('PUT', `/api/notes/${c.data.id}`, { title: 'Edited', tags: ['qa'] })).data.title === 'Edited', 'note updated');
     check((await r('PATCH', `/api/notes/${c.data.id}/pin`)).data.pinned === true, 'note pinned');
     check((await r('GET', '/api/notes?tag=qa')).data.length === 1, 'filter by tag');
@@ -89,24 +90,25 @@ const TESTS = {
     const after = (await r('GET', `/api/summary?month=${month}`)).data;
     check(after.expenses - before.expenses === 1250, 'summary reflects transaction');
     check((await r('DELETE', `/api/transactions/${t.data.id}`)).status === 204, 'transaction deleted');
-    check(String((await r('GET', '/api/export.csv')).data).startsWith('date,category'), 'CSV export');
+    check(String((await r('GET', '/api/export.csv')).data).includes('дата,категория'), 'CSV export');
   },
   '09-paper-kitchen': async (r) => {
     check((await r('GET', '/api/recipes')).data.length === 6, 'recipes load');
-    check((await r('GET', '/api/recipes?q=ricotta')).data.length === 1, 'search by ingredient');
-    const n = await r('POST', '/api/recipes', { title: 'QA Toast', summary: 'Toast.', minutes: 5, servings: 1, tag: 'quick', ingredients: [{ qty: 1, unit: '', item: 'bread' }], steps: ['Toast it'] });
+    check((await r('GET', '/api/recipes?q=РИКОТТ')).data.length === 1, 'search by ingredient (Cyrillic, any case)');
+    const n = await r('POST', '/api/recipes', { title: 'Тост', summary: 'Просто тост.', minutes: 5, servings: 1, tag: 'быстро', ingredients: [{ qty: 1, unit: 'шт', item: 'хлеб' }], steps: ['Поджарить'] });
     check(n.status === 201, 'recipe submitted');
     check((await r('GET', `/api/recipes/${n.data.id}`)).data.ingredients.length === 1, 'recipe detail with ingredients');
     check((await r('POST', `/api/recipes/${n.data.id}/rate`, { stars: 4 })).data.rating === 4, 'rating');
-    check((await r('POST', `/api/recipes/${n.data.id}/comments`, { body: 'Yum' })).status === 201, 'comment');
+    check((await r('POST', `/api/recipes/${n.data.id}/comments`, { body: 'Вкусно' })).status === 201, 'comment');
   },
   '10-terminal-jobs': async (r) => {
     check((await r('GET', '/api/jobs')).data.length === 8, 'jobs load');
     check((await r('GET', '/api/jobs?q=rust')).data.length === 1, 'search');
+    check((await r('GET', '/api/jobs?q=москва')).data.length === 2, 'Cyrillic city search');
     check((await r('GET', '/api/jobs/1')).data.contact_email === undefined, 'employer email hidden');
-    const p = await r('POST', '/api/jobs', { title: 'QA Engineer', company: 'Testco', remote: 'y', level: 'middle', stack: 'playwright, ts', description: 'Break things professionally and often.', contact_email: 'qa@test.co' });
+    const p = await r('POST', '/api/jobs', { title: 'QA-инженер', company: 'Testco', remote: 'да', level: 'middle', stack: 'playwright, ts', description: 'Профессионально и часто ломаем всё подряд.', contact_email: 'qa@test.co' });
     check(p.status === 201, 'job posted');
-    const a = { name: 'Grace', email: 'g@h.io', message: 'I love finding bugs.' };
+    const a = { name: 'Грейс', email: 'g@h.io', message: 'Обожаю находить баги.' };
     check((await r('POST', `/api/jobs/${p.data.id}/apply`, a)).status === 201, 'application sent');
     check((await r('POST', `/api/jobs/${p.data.id}/apply`, a)).status === 409, 'duplicate application blocked');
   },

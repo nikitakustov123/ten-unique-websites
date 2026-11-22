@@ -1,4 +1,4 @@
-// Orbit Voyages — space tourism agency: destinations, launches with seat limits, bookings.
+// Orbit Voyages — агентство космического туризма: направления, старты с лимитом мест, бронирования.
 import express from 'express';
 import { DatabaseSync } from 'node:sqlite';
 import { mkdirSync } from 'node:fs';
@@ -49,13 +49,13 @@ if (db.prepare('SELECT COUNT(*) AS n FROM destinations').get().n === 0) {
   const ins = db.prepare('INSERT INTO destinations (slug, name, tagline, description, distance, duration_days, price_k, hue, gravity) VALUES (?,?,?,?,?,?,?,?,?)');
   const launch = db.prepare('INSERT INTO launches (destination_id, launch_date, vessel, seats_total) VALUES (?,?,?,?)');
   const dests = [
-    ['luna', 'Luna Base Selene', 'Weekend on the Moon', 'Walk the Sea of Tranquility, sleep under an Earthrise and play golf at one-sixth gravity.', '384,400 km', 6, 450, 220, '0.17 g'],
-    ['mars', 'Olympus Station', 'Climb the tallest volcano', 'A guided ascent of Olympus Mons with nights in pressurised glass domes overlooking Valles Marineris.', '225M km', 210, 2900, 15, '0.38 g'],
-    ['europa', 'Europa Deep', 'Dive under the ice', 'Submarine expeditions through the frozen ocean of Jupiter’s most mysterious moon.', '628M km', 640, 7800, 190, '0.13 g'],
-    ['saturn', 'Ring Runner', 'Surf the rings of Saturn', 'A zero-g cruise skimming the ice rings with an observation deck facing the hexagon storm.', '1.2B km', 900, 12500, 40, '0 g'],
-    ['leo', 'Halo Orbital Hotel', 'Sixteen sunrises a day', 'The classic: low Earth orbit, panoramic cupola suites and a zero-g dining room.', '420 km', 3, 120, 260, '0 g'],
+    ['luna', 'Лунная база «Селена»', 'Выходные на Луне', 'Прогулка по Морю Спокойствия, ночь под восходом Земли и гольф при одной шестой гравитации.', '384 400 км', 6, 450, 220, '0,17 g'],
+    ['mars', 'Станция «Олимп»', 'Восхождение на высочайший вулкан', 'Восхождение на гору Олимп с гидом и ночёвки в герметичных стеклянных куполах над долинами Маринер.', '225 млн км', 210, 2900, 15, '0,38 g'],
+    ['europa', 'Глубины Европы', 'Погружение подо льдом', 'Экспедиции на подводной лодке по замёрзшему океану самого загадочного спутника Юпитера.', '628 млн км', 640, 7800, 190, '0,13 g'],
+    ['saturn', 'Кольца Сатурна', 'Сёрфинг по кольцам', 'Круиз в невесомости вдоль ледяных колец со смотровой палубой, обращённой к шестиугольному шторму.', '1,2 млрд км', 900, 12500, 40, '0 g'],
+    ['leo', 'Орбитальный отель «Гало»', 'Шестнадцать рассветов в день', 'Классика: низкая околоземная орбита, люксы с панорамным куполом и ресторан в невесомости.', '420 км', 3, 120, 260, '0 g'],
   ];
-  const vessels = ['ISV Aurora', 'ISV Kepler', 'ISV Meridian', 'ISV Halcyon'];
+  const vessels = ['«Аврора»', '«Кеплер»', '«Меридиан»', '«Альциона»'];
   dests.forEach((d, i) => {
     const id = Number(ins.run(...d).lastInsertRowid);
     for (let k = 0; k < 3; k++) {
@@ -85,7 +85,7 @@ app.get('/api/destinations', (req, res) => {
 
 app.get('/api/destinations/:slug', (req, res) => {
   const d = db.prepare('SELECT * FROM destinations WHERE slug = ?').get(String(req.params.slug));
-  if (!d) return fail(res, 'Destination not found', 404);
+  if (!d) return fail(res, 'Направление не найдено', 404);
   d.launches = db.prepare(`SELECT l.id, l.launch_date, l.vessel, l.seats_total, ${seatsLeftSql} AS seats_left FROM launches l WHERE l.destination_id = ? ORDER BY l.launch_date`).all(d.id);
   res.json(d);
 });
@@ -96,27 +96,27 @@ app.post('/api/bookings', (req, res) => {
   const seats = Math.trunc(Number(req.body.seats));
   const cabin = text(req.body.cabin, 10);
   const launchId = Number(req.body.launch_id);
-  if (fullName.length < 2) return fail(res, 'Crew member name is required.');
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return fail(res, 'A valid email is required for mission briefings.');
-  if (!(seats >= 1 && seats <= 6)) return fail(res, 'You can book 1–6 seats.');
-  if (!CABIN_MULT[cabin]) return fail(res, 'Unknown cabin class.');
+  if (fullName.length < 2) return fail(res, 'Укажите имя участника экипажа.');
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return fail(res, 'Нужен корректный email для брифингов миссии.');
+  if (!(seats >= 1 && seats <= 6)) return fail(res, 'Можно забронировать от 1 до 6 мест.');
+  if (!CABIN_MULT[cabin]) return fail(res, 'Неизвестный класс каюты.');
 
   db.exec('BEGIN IMMEDIATE');
   try {
     const l = db.prepare(`SELECT l.*, d.price_k, d.name AS destination, ${seatsLeftSql} AS seats_left FROM launches l JOIN destinations d ON d.id = l.destination_id WHERE l.id = ?`).get(launchId);
-    if (!l) { db.exec('ROLLBACK'); return fail(res, 'Launch not found.', 404); }
-    if (l.seats_left < seats) { db.exec('ROLLBACK'); return fail(res, `Only ${l.seats_left} seat(s) left on this launch.`, 409); }
+    if (!l) { db.exec('ROLLBACK'); return fail(res, 'Старт не найден.', 404); }
+    if (l.seats_left < seats) { db.exec('ROLLBACK'); return fail(res, `На этот старт осталось мест: ${l.seats_left}.`, 409); }
     const code = 'ORB-' + randomBytes(3).toString('hex').toUpperCase();
     db.prepare('INSERT INTO bookings (code, launch_id, full_name, email, seats, cabin) VALUES (?,?,?,?,?,?)').run(code, launchId, fullName, email, seats, cabin);
     db.exec('COMMIT');
-    res.status(201).json({ code, destination: l.destination, launch_date: l.launch_date, vessel: l.vessel, seats, cabin, total_k: Math.round(l.price_k * CABIN_MULT[cabin] * seats) });
+    res.status(201).json({ code, full_name: fullName, destination: l.destination, launch_date: l.launch_date, vessel: l.vessel, seats, cabin, total_k: Math.round(l.price_k * CABIN_MULT[cabin] * seats) });
   } catch (e) { db.exec('ROLLBACK'); throw e; }
 });
 
 app.get('/api/bookings/:code', (req, res) => {
   const b = db.prepare(`SELECT b.code, b.full_name, b.seats, b.cabin, b.created_at, l.launch_date, l.vessel, d.name AS destination, d.price_k
     FROM bookings b JOIN launches l ON l.id = b.launch_id JOIN destinations d ON d.id = l.destination_id WHERE b.code = ?`).get(text(req.params.code, 12).toUpperCase());
-  if (!b) return fail(res, 'No booking with that code.', 404);
+  if (!b) return fail(res, 'Бронирование с таким кодом не найдено.', 404);
   b.total_k = Math.round(b.price_k * CABIN_MULT[b.cabin] * b.seats);
   delete b.price_k;
   res.json(b);
@@ -124,10 +124,10 @@ app.get('/api/bookings/:code', (req, res) => {
 
 app.delete('/api/bookings/:code', (req, res) => {
   const r = db.prepare('DELETE FROM bookings WHERE code = ? AND email = ?').run(text(req.params.code, 12).toUpperCase(), text(req.body?.email, 120));
-  if (!r.changes) return fail(res, 'Booking not found or email does not match.', 404);
+  if (!r.changes) return fail(res, 'Бронирование не найдено или email не совпадает.', 404);
   res.status(204).end();
 });
 
-app.use('/api', (req, res) => fail(res, 'Not found', 404));
-app.use((err, req, res, _next) => { console.error(err); fail(res, 'Mission control error.', 500); });
+app.use('/api', (req, res) => fail(res, 'Не найдено', 404));
+app.use((err, req, res, _next) => { console.error(err); fail(res, 'Ошибка центра управления полётами.', 500); });
 app.listen(PORT, () => console.log(`Orbit Voyages → http://localhost:${PORT}`));

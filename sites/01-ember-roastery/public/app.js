@@ -1,5 +1,6 @@
 const $ = (s, el = document) => el.querySelector(s);
-const money = (c) => `$${(c / 100).toFixed(2)}`;
+const money = (c) => `${Math.round(c / 100).toLocaleString('ru-RU')} ₽`;
+const CATS = { espresso: 'эспрессо', filter: 'фильтр', beans: 'зерно', bakery: 'выпечка' };
 const el = (tag, props = {}, ...kids) => {
   const n = Object.assign(document.createElement(tag), props);
   kids.flat().forEach((k) => n.append(k));
@@ -9,7 +10,7 @@ const el = (tag, props = {}, ...kids) => {
 async function api(url, opts = {}) {
   const res = await fetch(url, { headers: { 'Content-Type': 'application/json' }, ...opts });
   const data = await res.json();
-  if (!res.ok) throw new Error(data.error || 'Request failed');
+  if (!res.ok) throw new Error(data.error || 'Ошибка запроса');
   return data;
 }
 
@@ -29,15 +30,15 @@ async function loadMenu(cat = '') {
   grid.replaceChildren(
     ...products.map((p, i) => {
       const card = el('article', { className: 'item' },
-        el('span', { className: 'cat', textContent: p.category }),
+        el('span', { className: 'cat', textContent: CATS[p.category] }),
         el('h3', { textContent: p.name }),
         el('p', { className: 'origin', textContent: p.origin }),
         el('p', { className: 'notes', textContent: p.notes }),
-        el('div', { className: 'roast', title: `Roast level ${p.roast}/5` },
+        el('div', { className: 'roast', title: `Степень обжарки ${p.roast}/5` },
           [1, 2, 3, 4, 5].map((n) => el('i', { className: n <= p.roast ? 'on' : '' }))),
         el('div', { className: 'item-foot' },
           el('span', { className: 'price', textContent: money(p.price_cents) }),
-          el('button', { className: 'add', textContent: '+', ariaLabel: `Add ${p.name}`, onclick: () => addToCart(p) })),
+          el('button', { className: 'add', textContent: '+', ariaLabel: `Добавить ${p.name}`, onclick: () => addToCart(p) })),
       );
       card.style.animationDelay = `${i * 60}ms`;
       card.addEventListener('mousemove', (e) => {
@@ -69,7 +70,7 @@ function addToCart(p) {
   renderCart();
   const badge = $('#cartCount');
   badge.classList.remove('bump'); void badge.offsetWidth; badge.classList.add('bump');
-  toast(`${p.name} added ☕`);
+  toast(`${p.name} — в корзине ☕`);
 }
 
 function renderCart() {
@@ -77,7 +78,7 @@ function renderCart() {
   $('#cartCount').textContent = cart.reduce((s, l) => s + l.qty, 0);
   $('#cartTotal').textContent = money(cart.reduce((s, l) => s + l.qty * l.price_cents, 0));
   const list = $('#cartList');
-  if (!cart.length) return list.replaceChildren(el('li', { className: 'empty', textContent: 'Your cart is empty — go grab something warm.' }));
+  if (!cart.length) return list.replaceChildren(el('li', { className: 'empty', textContent: 'Корзина пуста — самое время взять что-нибудь тёплое.' }));
   list.replaceChildren(...cart.map((l) =>
     el('li', {},
       el('span', { textContent: l.name }),
@@ -102,7 +103,7 @@ $('#orderForm').addEventListener('submit', async (e) => {
       body: JSON.stringify({ ...Object.fromEntries(f), items: cart.map(({ id, qty }) => ({ id, qty })) }),
     });
     cart = []; renderCart(); e.target.reset(); toggleDrawer(false);
-    toast(`Order #${order.id} placed — see you at ${order.pickup_time}!`);
+    toast(`Заказ №${order.id} принят — ждём вас в ${order.pickup_time}!`);
   } catch (err) { toast(err.message); }
 });
 
@@ -115,7 +116,7 @@ paintStars();
 
 async function loadReviews() {
   const { reviews, stats } = await api('/api/reviews');
-  $('#ratingSummary').textContent = `★ ${stats.avg ?? '–'} from ${stats.count} guests`;
+  $('#ratingSummary').textContent = `★ ${stats.avg ?? '–'} · ${stats.count} отзывов`;
   $('#reviews-list').replaceChildren(...reviews.map((r) =>
     el('article', { className: 'review' },
       el('div', { className: 'stars-view', textContent: '★'.repeat(r.rating) + '☆'.repeat(5 - r.rating) }),
@@ -129,7 +130,7 @@ $('#reviewForm').addEventListener('submit', async (e) => {
   try {
     await api('/api/reviews', { method: 'POST', body: JSON.stringify({ ...f, rating }) });
     e.target.reset(); rating = 5; paintStars();
-    toast('Thank you for the kind words!');
+    toast('Спасибо за тёплые слова!');
     loadReviews();
   } catch (err) { toast(err.message); }
 });

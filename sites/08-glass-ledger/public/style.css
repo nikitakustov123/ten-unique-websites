@@ -7,7 +7,7 @@
   --mint: #5eead4;
   --rose: #f472b6;
   --violet: #a78bfa;
-  --font: 'Plus Jakarta Sans', system-ui, sans-serif;
+  --font: 'Montserrat', system-ui, sans-serif;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: var(--font); background: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden; }

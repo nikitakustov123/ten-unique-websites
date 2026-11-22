@@ -1,4 +1,4 @@
-// Glass Ledger — personal finance tracker: transactions CRUD, categories with budgets, monthly analytics, CSV export.
+// Glass Ledger — личные финансы: операции, категории с бюджетами, аналитика по месяцам, экспорт в CSV.
 import express from 'express';
 import { DatabaseSync } from 'node:sqlite';
 import { mkdirSync } from 'node:fs';
@@ -33,14 +33,16 @@ db.exec(`
 `);
 
 if (db.prepare('SELECT COUNT(*) AS n FROM categories').get().n === 0) {
+  const K = 30; // demo data was designed in dollars; scale to realistic ruble amounts
   const c = db.prepare('INSERT INTO categories (name, icon, color, kind, monthly_budget_cents) VALUES (?,?,?,?,?)');
   const cats = [
-    ['Salary', '💼', '#5eead4', 'income', null], ['Freelance', '🧑‍💻', '#a78bfa', 'income', null],
-    ['Rent', '🏠', '#f472b6', 'expense', 140000], ['Groceries', '🛒', '#fbbf24', 'expense', 45000],
-    ['Dining', '🍜', '#fb923c', 'expense', 25000], ['Transport', '🚇', '#60a5fa', 'expense', 12000],
-    ['Fun', '🎮', '#c084fc', 'expense', 15000], ['Health', '💊', '#34d399', 'expense', 8000],
+    ['Зарплата', '💼', '#5eead4', 'income', null], ['Фриланс', '🧑‍💻', '#a78bfa', 'income', null],
+    ['Аренда', '🏠', '#f472b6', 'expense', K * 140000], ['Продукты', '🛒', '#fbbf24', 'expense', K * 45000],
+    ['Кафе', '🍜', '#fb923c', 'expense', K * 25000], ['Транспорт', '🚇', '#60a5fa', 'expense', K * 12000],
+    ['Досуг', '🎮', '#c084fc', 'expense', K * 15000], ['Здоровье', '💊', '#34d399', 'expense', K * 8000],
   ];
   const ids = Object.fromEntries(cats.map((x) => [x[0], Number(c.run(...x).lastInsertRowid)]));
+  const money = (v) => Math.round(v * K); // seed amounts are scaled to rubles
   const t = db.prepare('INSERT INTO transactions (category_id, amount_cents, note, date) VALUES (?,?,?,?)');
   // Deterministic pseudo-random seed data for the last 6 months
   let seed = 42; const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
@@ -49,17 +51,17 @@ if (db.prepare('SELECT COUNT(*) AS n FROM categories').get().n === 0) {
     const y = now.getFullYear(), mo = now.getMonth() - m;
     const day = (d) => new Date(Date.UTC(y, mo, d)).toISOString().slice(0, 10);
     const lastDay = m === 0 ? now.getDate() : 28;
-    t.run(ids.Salary, 420000, 'Monthly salary', day(1));
-    if (rnd() > 0.4) t.run(ids.Freelance, Math.round(50000 + rnd() * 90000), 'Client project', day(Math.min(lastDay, 15)));
-    t.run(ids.Rent, 140000, 'Apartment rent', day(2));
+    t.run(ids['Зарплата'], money(420000), 'Зарплата за месяц', day(1));
+    if (rnd() > 0.4) t.run(ids['Фриланс'], money(50000 + rnd() * 90000), 'Проект для клиента', day(Math.min(lastDay, 15)));
+    t.run(ids['Аренда'], money(140000), 'Аренда квартиры', day(2));
     for (let i = 0; i < 8; i++) {
       const d = 1 + Math.floor(rnd() * lastDay);
-      t.run(ids.Groceries, Math.round(3000 + rnd() * 6000), ['Farmers market', 'Supermarket', 'Corner shop'][i % 3], day(d));
-      if (i % 2 === 0) t.run(ids.Dining, Math.round(1500 + rnd() * 5000), ['Ramen night', 'Brunch', 'Pizza', 'Sushi'][i % 4], day(d));
-      if (i % 3 === 0) t.run(ids.Transport, Math.round(800 + rnd() * 3000), 'Metro & taxi', day(d));
+      t.run(ids['Продукты'], money(3000 + rnd() * 6000), ['Фермерский рынок', 'Супермаркет', 'Магазин у дома'][i % 3], day(d));
+      if (i % 2 === 0) t.run(ids['Кафе'], money(1500 + rnd() * 5000), ['Вечер рамена', 'Бранч', 'Пицца', 'Суши'][i % 4], day(d));
+      if (i % 3 === 0) t.run(ids['Транспорт'], money(800 + rnd() * 3000), 'Метро и такси', day(d));
     }
-    t.run(ids.Fun, Math.round(3000 + rnd() * 12000), 'Concert tickets', day(Math.min(lastDay, 20)));
-    if (rnd() > 0.5) t.run(ids.Health, Math.round(2000 + rnd() * 5000), 'Pharmacy', day(Math.min(lastDay, 10)));
+    t.run(ids['Досуг'], money(3000 + rnd() * 12000), 'Билеты на концерт', day(Math.min(lastDay, 20)));
+    if (rnd() > 0.5) t.run(ids['Здоровье'], money(2000 + rnd() * 5000), 'Аптека', day(Math.min(lastDay, 10)));
   }
 }
 
@@ -71,9 +73,9 @@ function parseTx(body) {
   const amount = Math.round(Number(body.amount) * 100);
   const categoryId = Number(body.category_id);
   const date = text(body.date, 10);
-  if (!(amount > 0 && amount < 1e11)) return { error: 'Amount must be a positive number.' };
-  if (!db.prepare('SELECT 1 FROM categories WHERE id = ?').get(categoryId)) return { error: 'Choose a category.' };
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || Number.isNaN(Date.parse(date))) return { error: 'Invalid date.' };
+  if (!(amount > 0 && amount < 1e11)) return { error: 'Сумма должна быть положительным числом.' };
+  if (!db.prepare('SELECT 1 FROM categories WHERE id = ?').get(categoryId)) return { error: 'Выберите категорию.' };
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || Number.isNaN(Date.parse(date))) return { error: 'Некорректная дата.' };
   return { amount, categoryId, date, note: text(body.note, 140) };
 }
 
@@ -86,9 +88,9 @@ app.get('/api/categories', (req, res) => res.json(db.prepare('SELECT * FROM cate
 
 app.patch('/api/categories/:id/budget', (req, res) => {
   const cents = req.body.budget === null || req.body.budget === '' ? null : Math.round(Number(req.body.budget) * 100);
-  if (cents !== null && !(cents >= 0)) return fail(res, 'Budget must be a positive number.');
+  if (cents !== null && !(cents >= 0)) return fail(res, 'Бюджет должен быть положительным числом.');
   const r = db.prepare("UPDATE categories SET monthly_budget_cents = ? WHERE id = ? AND kind = 'expense'").run(cents, Number(req.params.id));
-  if (!r.changes) return fail(res, 'Expense category not found', 404);
+  if (!r.changes) return fail(res, 'Категория расходов не найдена', 404);
   res.json(db.prepare('SELECT * FROM categories WHERE id = ?').get(Number(req.params.id)));
 });
 
@@ -109,13 +111,13 @@ app.put('/api/transactions/:id', (req, res) => {
   const tx = parseTx(req.body);
   if (tx.error) return fail(res, tx.error);
   const r = db.prepare('UPDATE transactions SET category_id = ?, amount_cents = ?, note = ?, date = ? WHERE id = ?').run(tx.categoryId, tx.amount, tx.note, tx.date, Number(req.params.id));
-  if (!r.changes) return fail(res, 'Transaction not found', 404);
+  if (!r.changes) return fail(res, 'Операция не найдена', 404);
   res.json(db.prepare('SELECT * FROM transactions WHERE id = ?').get(Number(req.params.id)));
 });
 
 app.delete('/api/transactions/:id', (req, res) => {
   const r = db.prepare('DELETE FROM transactions WHERE id = ?').run(Number(req.params.id));
-  if (!r.changes) return fail(res, 'Transaction not found', 404);
+  if (!r.changes) return fail(res, 'Операция не найдена', 404);
   res.status(204).end();
 });
 
@@ -141,10 +143,11 @@ app.get('/api/summary', (req, res) => {
 app.get('/api/export.csv', (req, res) => {
   const rows = db.prepare('SELECT t.date, c.name AS category, c.kind, t.amount_cents, t.note FROM transactions t JOIN categories c ON c.id = t.category_id ORDER BY t.date').all();
   const esc = (v) => `"${String(v).replace(/"/g, '""')}"`;
-  const csv = ['date,category,type,amount,note', ...rows.map((r) => [r.date, esc(r.category), r.kind, (r.amount_cents / 100).toFixed(2), esc(r.note)].join(','))].join('\n');
+  const kind = { income: 'доход', expense: 'расход' };
+  const csv = '\ufeff' + ['дата,категория,тип,сумма,комментарий', ...rows.map((r) => [r.date, esc(r.category), kind[r.kind], (r.amount_cents / 100).toFixed(2), esc(r.note)].join(','))].join('\n');
   res.set('Content-Type', 'text/csv; charset=utf-8').set('Content-Disposition', 'attachment; filename="glass-ledger.csv"').send(csv);
 });
 
-app.use('/api', (req, res) => fail(res, 'Not found', 404));
-app.use((err, req, res, _next) => { console.error(err); fail(res, 'Unexpected error.', 500); });
+app.use('/api', (req, res) => fail(res, 'Не найдено', 404));
+app.use((err, req, res, _next) => { console.error(err); fail(res, 'Непредвиденная ошибка.', 500); });
 app.listen(PORT, () => console.log(`Glass Ledger → http://localhost:${PORT}`));

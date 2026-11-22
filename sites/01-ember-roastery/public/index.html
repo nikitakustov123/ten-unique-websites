@@ -1,13 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Ember &amp; Oak — Small Batch Coffee Roastery</title>
-  <meta name="description" content="Small-batch coffee roasted over oak fire. Order ahead for pickup." />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;1,9..144,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <title>Ember &amp; Oak — кофейня и обжарка малыми партиями</title>
+  <meta name="description" content="Кофе малыми партиями, обжаренный на дубовых дровах. Закажите заранее и заберите без очереди." />
+  <link rel="stylesheet" href="fonts/fonts.css" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -16,23 +14,23 @@
   <header class="nav">
     <a href="#" class="logo">Ember <em>&amp;</em> Oak</a>
     <nav>
-      <a href="#menu">Menu</a>
-      <a href="#story">Story</a>
-      <a href="#reviews">Reviews</a>
+      <a href="#menu">Меню</a>
+      <a href="#story">О нас</a>
+      <a href="#reviews">Отзывы</a>
     </nav>
-    <button class="cart-btn" id="cartBtn" aria-label="Open cart">
-      Cart <span class="badge" id="cartCount">0</span>
+    <button class="cart-btn" id="cartBtn" aria-label="Открыть корзину">
+      Корзина <span class="badge" id="cartCount">0</span>
     </button>
   </header>
 
   <section class="hero">
     <div class="hero-copy">
-      <p class="eyebrow">Roasted over oak fire · since 2014</p>
-      <h1>Coffee with a <em>slow-burning</em> soul.</h1>
-      <p class="lead">Single-origin beans, roasted in tiny batches every morning and brewed by people who care a little too much.</p>
+      <p class="eyebrow">Обжариваем на дубовых дровах · с 2014 года</p>
+      <h1>Кофе с <em>медленно тлеющей</em> душой.</h1>
+      <p class="lead">Моносорта, которые мы обжариваем крошечными партиями каждое утро, и бариста, которым не всё равно — даже слишком.</p>
       <div class="hero-actions">
-        <a href="#menu" class="btn btn-primary">Order for pickup</a>
-        <a href="#story" class="btn btn-ghost">Our roasting story</a>
+        <a href="#menu" class="btn btn-primary">Заказать навынос</a>
+        <a href="#story" class="btn btn-ghost">Как мы обжариваем</a>
       </div>
     </div>
     <div class="cup-wrap" aria-hidden="true">
@@ -48,20 +46,20 @@
 
   <div class="marquee" aria-hidden="true">
     <div class="marquee-track">
-      <span>Ethiopia</span><span>✦</span><span>Kenya</span><span>✦</span><span>Colombia</span><span>✦</span><span>Guatemala</span><span>✦</span><span>Rwanda</span><span>✦</span><span>Sumatra</span><span>✦</span><span>Peru</span><span>✦</span>
-      <span>Ethiopia</span><span>✦</span><span>Kenya</span><span>✦</span><span>Colombia</span><span>✦</span><span>Guatemala</span><span>✦</span><span>Rwanda</span><span>✦</span><span>Sumatra</span><span>✦</span><span>Peru</span><span>✦</span>
+      <span>Эфиопия</span><span>✦</span><span>Кения</span><span>✦</span><span>Колумбия</span><span>✦</span><span>Гватемала</span><span>✦</span><span>Руанда</span><span>✦</span><span>Суматра</span><span>✦</span><span>Перу</span><span>✦</span>
+      <span>Эфиопия</span><span>✦</span><span>Кения</span><span>✦</span><span>Колумбия</span><span>✦</span><span>Гватемала</span><span>✦</span><span>Руанда</span><span>✦</span><span>Суматра</span><span>✦</span><span>Перу</span><span>✦</span>
     </div>
   </div>
 
   <section id="menu" class="section">
     <div class="section-head reveal">
-      <h2>The Menu</h2>
+      <h2>Меню</h2>
       <div class="tabs" id="tabs" role="tablist">
-        <button class="tab active" data-cat="">All</button>
-        <button class="tab" data-cat="espresso">Espresso</button>
-        <button class="tab" data-cat="filter">Filter</button>
-        <button class="tab" data-cat="beans">Beans</button>
-        <button class="tab" data-cat="bakery">Bakery</button>
+        <button class="tab active" data-cat="">Всё</button>
+        <button class="tab" data-cat="espresso">Эспрессо</button>
+        <button class="tab" data-cat="filter">Фильтр</button>
+        <button class="tab" data-cat="beans">Зерно</button>
+        <button class="tab" data-cat="bakery">Выпечка</button>
       </div>
     </div>
     <div class="menu-grid" id="menuGrid"></div>
@@ -70,56 +68,56 @@
   <section id="story" class="section story">
     <div class="story-card reveal">
       <span class="num">01</span>
-      <h3>Sourced by hand</h3>
-      <p>We visit every farm we buy from and pay well above fair-trade prices.</p>
+      <h3>Отбираем вручную</h3>
+      <p>Мы бываем на каждой ферме, у которой покупаем зерно, и платим заметно выше честной цены.</p>
     </div>
     <div class="story-card reveal">
       <span class="num">02</span>
-      <h3>Roasted over oak</h3>
-      <p>A 1962 drum roaster fired with seasoned oak gives our beans their gentle smoke.</p>
+      <h3>Обжариваем на дубе</h3>
+      <p>Барабанный ростер 1962 года и выдержанные дубовые дрова дают зерну мягкую дымную ноту.</p>
     </div>
     <div class="story-card reveal">
       <span class="num">03</span>
-      <h3>Brewed with patience</h3>
-      <p>Every cup is weighed, timed and tasted. No shortcuts, ever.</p>
+      <h3>Завариваем без спешки</h3>
+      <p>Каждую чашку взвешиваем, засекаем и пробуем. Никаких компромиссов.</p>
     </div>
   </section>
 
   <section id="reviews" class="section">
     <div class="section-head reveal">
-      <h2>Kind words</h2>
+      <h2>Тёплые слова</h2>
       <p class="rating-summary" id="ratingSummary"></p>
     </div>
     <div class="reviews" id="reviews-list"></div>
     <form class="review-form reveal" id="reviewForm">
-      <h3>Leave a review</h3>
-      <input name="author" placeholder="Your name" maxlength="60" required />
+      <h3>Оставить отзыв</h3>
+      <input name="author" placeholder="Ваше имя" maxlength="60" required />
       <div class="stars" id="starPicker">
         <button type="button" data-v="1">★</button><button type="button" data-v="2">★</button><button type="button" data-v="3">★</button><button type="button" data-v="4">★</button><button type="button" data-v="5">★</button>
       </div>
-      <textarea name="body" placeholder="How was your coffee?" maxlength="500" required></textarea>
-      <button class="btn btn-primary" type="submit">Post review</button>
+      <textarea name="body" placeholder="Как вам наш кофе?" maxlength="500" required></textarea>
+      <button class="btn btn-primary" type="submit">Отправить отзыв</button>
     </form>
   </section>
 
   <footer class="footer">
     <p class="logo">Ember <em>&amp;</em> Oak</p>
-    <p>14 Copper Lane · Open daily 7:00–19:00</p>
-    <p class="muted">© 2026 Ember &amp; Oak Roastery</p>
+    <p>ул. Медная, 14 · Ежедневно 7:00–21:00</p>
+    <p class="muted">© 2026 Кофейня Ember &amp; Oak</p>
   </footer>
 
   <aside class="drawer" id="drawer" aria-hidden="true">
     <div class="drawer-head">
-      <h3>Your order</h3>
-      <button class="close" id="closeDrawer" aria-label="Close cart">×</button>
+      <h3>Ваш заказ</h3>
+      <button class="close" id="closeDrawer" aria-label="Закрыть корзину">×</button>
     </div>
     <ul class="cart-list" id="cartList"></ul>
-    <p class="cart-total">Total <strong id="cartTotal">$0.00</strong></p>
+    <p class="cart-total">Итого <strong id="cartTotal">0 ₽</strong></p>
     <form id="orderForm" class="order-form">
-      <input name="customer" placeholder="Name" maxlength="80" required />
+      <input name="customer" placeholder="Имя" maxlength="80" required />
       <input name="email" type="email" placeholder="Email" maxlength="120" required />
-      <label>Pickup time <input name="pickup_time" type="time" min="07:00" max="19:00" required /></label>
-      <button class="btn btn-primary" type="submit">Place order</button>
+      <label>Время, когда заберёте <input name="pickup_time" type="time" min="07:00" max="21:00" required /></label>
+      <button class="btn btn-primary" type="submit">Оформить заказ</button>
     </form>
   </aside>
   <div class="overlay" id="overlay"></div>

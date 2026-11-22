@@ -1,12 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>SYNTHWAVE FM — 84.0 · Broadcasting from 1984</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Monoton&family=Audiowide&family=Rajdhani:wght@400;600&display=swap" rel="stylesheet" />
+  <title>SYNTHWAVE FM — 84.0 · вещаем прямо из 1984-го</title>
+  <link rel="stylesheet" href="fonts/fonts.css" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -19,43 +17,43 @@
 
   <header class="top">
     <h1 class="logo">SYNTHWAVE<span>FM</span></h1>
-    <p class="freq">84.0 MHz · <span id="listeners">…</span> listening</p>
+    <p class="freq">84.0 МГц · слушают <span id="listeners">…</span></p>
   </header>
 
   <section class="player">
     <div class="deck">
-      <button class="play" id="playBtn" aria-label="Play">▶</button>
+      <button class="play" id="playBtn" aria-label="Слушать">▶</button>
       <div class="np">
-        <p class="label"><span class="live-dot"></span> ON AIR · <b id="showTitle">…</b> with <b id="showHost">…</b></p>
-        <p class="track" id="trackLine">Press play to tune in</p>
+        <p class="label"><span class="live-dot"></span> В ЭФИРЕ · <b id="showTitle">…</b>, ведущий <b id="showHost">…</b></p>
+        <p class="track" id="trackLine">Нажмите ▶, чтобы включить эфир</p>
         <p class="ded" id="dedication"></p>
       </div>
-      <input type="range" id="volume" min="0" max="1" step="0.01" value="0.5" aria-label="Volume" />
+      <input type="range" id="volume" min="0" max="1" step="0.01" value="0.5" aria-label="Громкость" />
     </div>
     <canvas id="viz" width="900" height="140" aria-hidden="true"></canvas>
   </section>
 
   <main class="panels">
     <section class="panel">
-      <h2>REQUEST LINE</h2>
+      <h2>СТОЛ ЗАЯВОК</h2>
       <form id="reqForm" class="req-form">
-        <input name="artist" placeholder="Artist" maxlength="80" required />
-        <input name="title" placeholder="Track" maxlength="100" required />
-        <input name="requested_by" placeholder="Your handle" maxlength="30" />
-        <input name="dedication" placeholder="Dedication (optional)" maxlength="140" />
-        <button class="btn" type="submit">SEND REQUEST</button>
+        <input name="artist" placeholder="Исполнитель" maxlength="80" required />
+        <input name="title" placeholder="Трек" maxlength="100" required />
+        <input name="requested_by" placeholder="Ваш ник" maxlength="30" />
+        <input name="dedication" placeholder="Посвящение (необязательно)" maxlength="140" />
+        <button class="btn" type="submit">ОТПРАВИТЬ ЗАЯВКУ</button>
       </form>
       <ol class="queue" id="queue"></ol>
-      <button class="btn ghost" id="djNext" title="DJ booth: mark top request as played">⏭ DJ: PLAY TOP REQUEST</button>
+      <button class="btn ghost" id="djNext" title="Пульт диджея: отметить верхнюю заявку сыгранной">⏭ DJ: ЗАПУСТИТЬ ТОП-ЗАЯВКУ</button>
     </section>
 
     <section class="panel">
-      <h2>TODAY'S SCHEDULE</h2>
+      <h2>РАСПИСАНИЕ НА СЕГОДНЯ</h2>
       <ul class="schedule" id="schedule"></ul>
     </section>
   </main>
 
-  <footer class="foot">BROADCASTING NEON SINCE 1984 · © 2026 SYNTHWAVE FM</footer>
+  <footer class="foot">НЕОН В ЭФИРЕ С 1984 ГОДА · © 2026 SYNTHWAVE FM</footer>
   <div class="toast" id="toast"></div>
   <script src="app.js"></script>
 </body>

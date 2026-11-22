@@ -1,4 +1,4 @@
-// Terminal Jobs — developer job board with a terminal UI: listings, search, applications, job posting.
+// Terminal Jobs — доска вакансий для разработчиков в виде терминала: список, поиск, отклики, публикация.
 import express from 'express';
 import { DatabaseSync } from 'node:sqlite';
 import { mkdirSync } from 'node:fs';
@@ -11,6 +11,11 @@ const LEVELS = ['junior', 'middle', 'senior', 'lead'];
 
 mkdirSync(path.join(__dirname, 'data'), { recursive: true });
 const db = new DatabaseSync(path.join(__dirname, 'data', 'jobs.db'));
+
+// SQLite's built-in LIKE is case-insensitive only for ASCII. Override it so that
+// search also ignores case for Cyrillic ("суп" finds "Суп").
+const likeRe = (p) => new RegExp('^' + p.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/%/g, '[\\s\\S]*').replace(/_/g, '[\\s\\S]') + '$', 'iu');
+db.function('like', { deterministic: true }, (p, v) => (p == null || v == null ? null : likeRe(String(p)).test(String(v)) ? 1 : 0));
 db.exec(`
   PRAGMA journal_mode = WAL;
   PRAGMA foreign_keys = ON;
@@ -43,14 +48,14 @@ db.exec(`
 if (db.prepare('SELECT COUNT(*) AS n FROM jobs').get().n === 0) {
   const ins = db.prepare('INSERT INTO jobs (title, company, location, remote, level, salary_min, salary_max, stack, description, contact_email, created_at) VALUES (?,?,?,?,?,?,?,?,?,?, datetime(\'now\', ?))');
   [
-    ['Senior Rust Engineer', 'Ferrous Labs', 'Berlin', 1, 'senior', 120, 160, 'rust,tokio,postgres', 'Build a low-latency streaming database. You will own the storage engine and query planner.', 'hiring@ferrous.dev', '-1 days'],
-    ['Frontend Developer (React)', 'Pixelcraft', 'Lisbon', 1, 'middle', 60, 85, 'react,typescript,css', 'Craft delightful interfaces for a design-tool used by 2M creators. Animation nerds welcome.', 'jobs@pixelcraft.io', '-2 days'],
-    ['Platform / SRE Engineer', 'Cloudnine', 'Amsterdam', 0, 'senior', 100, 135, 'kubernetes,go,terraform', 'Keep 4,000 nodes humming. On-call is shared, blameless and well paid.', 'sre@cloudnine.nl', '-3 days'],
-    ['Junior Python Developer', 'DataSprout', 'Remote (EU)', 1, 'junior', 40, 55, 'python,django,sql', 'Join a friendly team building climate-data APIs. Mentorship and learning budget included.', 'careers@datasprout.eu', '-4 days'],
-    ['ML Engineer', 'Neuronet', 'London', 0, 'senior', 130, 180, 'python,pytorch,cuda', 'Train and ship vision models to production for medical imaging.', 'ml@neuronet.ai', '-5 days'],
-    ['Tech Lead — Payments', 'Ledgerly', 'Remote', 1, 'lead', 150, 190, 'java,kotlin,kafka', 'Lead a team of 7 building real-time payment rails across 30 countries.', 'lead@ledgerly.com', '-6 days'],
-    ['Full-Stack Node.js Developer', 'Tinybird Studio', 'Warsaw', 1, 'middle', 55, 80, 'node,express,sqlite,vue', 'Small product studio, big ownership. Ship features end-to-end every week.', 'hey@tinybird.studio', '-8 days'],
-    ['iOS Engineer (Swift)', 'Moonwalk', 'Stockholm', 0, 'middle', 70, 95, 'swift,swiftui,combine', 'Build the fitness app your friends already use. Strong design culture.', 'ios@moonwalk.se', '-10 days'],
+    ['Senior Rust-разработчик', 'Ferrous Labs', 'Москва', 1, 'senior', 400, 550, 'rust,tokio,postgres', 'Пишем стриминговую базу данных с низкой задержкой. Вы будете отвечать за движок хранения и планировщик запросов.', 'hiring@ferrous.dev', '-1 days'],
+    ['Фронтенд-разработчик (React)', 'Pixelcraft', 'Санкт-Петербург', 1, 'middle', 220, 300, 'react,typescript,css', 'Создаём интерфейсы для дизайн-инструмента, которым пользуются 2 млн авторов. Любители анимаций — к нам.', 'jobs@pixelcraft.io', '-2 days'],
+    ['Platform / SRE-инженер', 'Cloudnine', 'Казань', 0, 'senior', 350, 450, 'kubernetes,go,terraform', 'Следим, чтобы 4 000 нод работали без сбоев. Дежурства по графику, без поиска виноватых и с хорошей оплатой.', 'sre@cloudnine.ru', '-3 days'],
+    ['Junior Python-разработчик', 'DataSprout', 'Удалённо (РФ)', 1, 'junior', 90, 130, 'python,django,sql', 'Дружная команда, делаем API для климатических данных. Наставник и бюджет на обучение.', 'careers@datasprout.ru', '-4 days'],
+    ['ML-инженер', 'Neuronet', 'Новосибирск', 0, 'senior', 420, 600, 'python,pytorch,cuda', 'Обучаем и выводим в прод модели компьютерного зрения для медицинской диагностики.', 'ml@neuronet.ai', '-5 days'],
+    ['Техлид — платежи', 'Ledgerly', 'Удалённо', 1, 'lead', 550, 700, 'java,kotlin,kafka', 'Руководим командой из 7 человек: строим платёжную инфраструктуру реального времени в 30 странах.', 'lead@ledgerly.com', '-6 days'],
+    ['Full-stack Node.js-разработчик', 'Tinybird Studio', 'Екатеринбург', 1, 'middle', 200, 280, 'node,express,sqlite,vue', 'Небольшая продуктовая студия, большая зона ответственности. Каждую неделю выпускаем фичи от и до.', 'hey@tinybird.studio', '-8 days'],
+    ['iOS-разработчик (Swift)', 'Moonwalk', 'Москва', 0, 'middle', 250, 330, 'swift,swiftui,combine', 'Делаем фитнес-приложение, которым уже пользуются ваши друзья. Сильная дизайн-культура.', 'ios@moonwalk.ru', '-10 days'],
   ].forEach((j) => ins.run(...j));
 }
 
@@ -66,8 +71,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.get('/api/jobs', (req, res) => {
   const where = [], args = [];
-  const q = text(req.query.q, 60).toLowerCase();
-  if (q) { where.push('(lower(title) LIKE ? OR lower(company) LIKE ? OR lower(stack) LIKE ? OR lower(location) LIKE ?)'); args.push(...Array(4).fill(`%${q}%`)); }
+  const q = text(req.query.q, 60);
+  if (q) { where.push('(title LIKE ? OR company LIKE ? OR stack LIKE ? OR location LIKE ?)'); args.push(...Array(4).fill(`%${q}%`)); }
   if (req.query.remote === '1') where.push('remote = 1');
   if (LEVELS.includes(req.query.level)) { where.push('level = ?'); args.push(req.query.level); }
   const rows = db.prepare(`SELECT j.id, j.title, j.company, j.location, j.remote, j.level, j.salary_min, j.salary_max, j.stack, j.created_at,
@@ -78,7 +83,7 @@ app.get('/api/jobs', (req, res) => {
 
 app.get('/api/jobs/:id', (req, res) => {
   const j = db.prepare('SELECT j.*, (SELECT COUNT(*) FROM applications a WHERE a.job_id = j.id) AS applicants FROM jobs j WHERE j.id = ?').get(Number(req.params.id));
-  if (!j) return fail(res, `job ${req.params.id}: no such job`, 404);
+  if (!j) return fail(res, `вакансия ${req.params.id}: не найдена`, 404);
   delete j.contact_email; // never expose employer email publicly
   res.json(shape(j));
 });
@@ -86,18 +91,18 @@ app.get('/api/jobs/:id', (req, res) => {
 app.post('/api/jobs', (req, res) => {
   const b = req.body || {};
   const job = {
-    title: text(b.title, 100), company: text(b.company, 80), location: text(b.location, 80) || 'Remote',
-    remote: /^(y|yes|true|1)$/i.test(String(b.remote)) ? 1 : 0, level: text(b.level, 10).toLowerCase(),
+    title: text(b.title, 100), company: text(b.company, 80), location: text(b.location, 80) || 'Удалённо',
+    remote: /^(y|yes|true|1|д|да)$/i.test(String(b.remote).trim()) ? 1 : 0, level: text(b.level, 10).toLowerCase(),
     salary_min: Number(b.salary_min) || null, salary_max: Number(b.salary_max) || null,
     stack: text(b.stack, 120).toLowerCase().split(/[\s,]+/).filter(Boolean).slice(0, 8).join(','),
     description: text(b.description, 1500), contact_email: text(b.contact_email, 120),
   };
-  if (job.title.length < 3 || job.company.length < 2) return fail(res, 'title and company are required');
-  if (!LEVELS.includes(job.level)) return fail(res, `level must be one of: ${LEVELS.join(', ')}`);
-  if (!job.stack) return fail(res, 'stack is required (e.g. "go, postgres")');
-  if (job.description.length < 20) return fail(res, 'description must be at least 20 characters');
-  if (!isEmail(job.contact_email)) return fail(res, 'contact_email is invalid');
-  if (job.salary_min && job.salary_max && job.salary_min > job.salary_max) return fail(res, 'salary_min > salary_max');
+  if (job.title.length < 3 || job.company.length < 2) return fail(res, 'нужны должность и компания');
+  if (!LEVELS.includes(job.level)) return fail(res, `уровень должен быть одним из: ${LEVELS.join(', ')}`);
+  if (!job.stack) return fail(res, 'укажите стек (например, "go, postgres")');
+  if (job.description.length < 20) return fail(res, 'описание — минимум 20 символов');
+  if (!isEmail(job.contact_email)) return fail(res, 'некорректный email для связи');
+  if (job.salary_min && job.salary_max && job.salary_min > job.salary_max) return fail(res, 'зарплата «от» больше, чем «до»');
   const id = Number(db.prepare('INSERT INTO jobs (title, company, location, remote, level, salary_min, salary_max, stack, description, contact_email) VALUES (?,?,?,?,?,?,?,?,?,?)')
     .run(job.title, job.company, job.location, job.remote, job.level, job.salary_min, job.salary_max, job.stack, job.description, job.contact_email).lastInsertRowid);
   res.status(201).json({ id });
@@ -105,16 +110,16 @@ app.post('/api/jobs', (req, res) => {
 
 app.post('/api/jobs/:id/apply', (req, res) => {
   const jobId = Number(req.params.id);
-  if (!db.prepare('SELECT 1 FROM jobs WHERE id = ?').get(jobId)) return fail(res, `job ${jobId}: no such job`, 404);
+  if (!db.prepare('SELECT 1 FROM jobs WHERE id = ?').get(jobId)) return fail(res, `вакансия ${jobId}: не найдена`, 404);
   const name = text(req.body.name, 80), email = text(req.body.email, 120), github = text(req.body.github, 120), message = text(req.body.message, 2000);
-  if (name.length < 2) return fail(res, 'name is required');
-  if (!isEmail(email)) return fail(res, 'email is invalid');
-  if (message.length < 10) return fail(res, 'message must be at least 10 characters');
+  if (name.length < 2) return fail(res, 'укажите имя');
+  if (!isEmail(email)) return fail(res, 'некорректный email');
+  if (message.length < 10) return fail(res, 'сообщение — минимум 10 символов');
   try {
     const id = Number(db.prepare('INSERT INTO applications (job_id, name, email, github, message) VALUES (?,?,?,?,?)').run(jobId, name, email, github || null, message).lastInsertRowid);
     res.status(201).json({ id, job_id: jobId });
   } catch (e) {
-    if (String(e.message).includes('UNIQUE')) return fail(res, 'you have already applied to this job with that email', 409);
+    if (String(e.message).includes('UNIQUE')) return fail(res, 'вы уже откликались на эту вакансию с этим email', 409);
     throw e;
   }
 });
@@ -128,6 +133,6 @@ app.get('/api/stats', (req, res) => {
   res.json(s);
 });
 
-app.use('/api', (req, res) => fail(res, 'Not found', 404));
-app.use((err, req, res, _next) => { console.error(err); fail(res, 'segmentation fault (core dumped)', 500); });
+app.use('/api', (req, res) => fail(res, 'Не найдено', 404));
+app.use((err, req, res, _next) => { console.error(err); fail(res, 'ошибка сегментации (образ памяти сброшен)', 500); });
 app.listen(PORT, () => console.log(`Terminal Jobs → http://localhost:${PORT}`));

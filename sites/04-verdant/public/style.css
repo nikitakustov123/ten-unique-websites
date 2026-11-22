@@ -5,8 +5,8 @@
   --forest: #23352a;
   --clay: #d48a6a;
   --blush: #f2d6c9;
-  --serif: 'DM Serif Display', Georgia, serif;
-  --sans: 'DM Sans', system-ui, sans-serif;
+  --serif: 'Prata', Georgia, serif;
+  --sans: 'Nunito', system-ui, sans-serif;
   --r: 28px;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -33,7 +33,7 @@ em { font-style: italic; color: var(--moss); }
 
 .hero { width: min(1100px, 92vw); margin: 0 auto; min-height: 85vh; display: grid; grid-template-columns: 1.1fr 1fr; align-items: center; gap: 3rem; }
 .pill { display: inline-block; background: #fff; padding: .4rem 1rem; border-radius: 999px; font-size: .85rem; box-shadow: 0 4px 20px -10px rgba(0,0,0,.2); }
-.hero h1 { font-family: var(--serif); font-weight: 400; font-size: clamp(2.8rem, 6vw, 5rem); line-height: 1.02; margin: 1.2rem 0; }
+.hero h1 { font-family: var(--serif); font-weight: 400; font-size: clamp(2.5rem, 5.2vw, 4.4rem); line-height: 1.02; margin: 1.2rem 0; }
 .hero p { font-size: 1.15rem; max-width: 30rem; opacity: .8; }
 .hero-cta { display: flex; gap: 1.5rem; align-items: center; margin-top: 2rem; }
 .btn { display: inline-block; background: var(--moss); color: var(--cream); border: none; padding: 1rem 2rem; border-radius: 999px; font: 700 1rem var(--sans); cursor: pointer; transition: transform .3s cubic-bezier(.3,1.6,.5,1), background .3s; }

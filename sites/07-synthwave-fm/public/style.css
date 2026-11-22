@@ -6,9 +6,9 @@
   --sunA: #ffd319;
   --sunB: #ff2975;
   --ice: #d1f7ff;
-  --display: 'Audiowide', sans-serif;
-  --neon: 'Monoton', cursive;
-  --body: 'Rajdhani', sans-serif;
+  --display: 'Jura', sans-serif;
+  --neon: 'Comfortaa', cursive;
+  --body: 'Jura', sans-serif;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { background: var(--night); color: var(--ice); font-family: var(--body); font-size: 18px; min-height: 100vh; overflow-x: hidden; }
@@ -32,7 +32,7 @@ body { background: var(--night); color: var(--ice); font-family: var(--body); fo
 @keyframes drive { to { background-position: 0 60px; } }
 
 .top { text-align: center; padding: 3rem 1rem 1rem; }
-.logo { font-family: var(--neon); font-weight: 400; font-size: clamp(2.5rem, 8vw, 6rem); color: var(--ice); text-shadow: 0 0 5px #fff, 0 0 15px var(--cyan), 0 0 35px var(--cyan), 0 0 70px var(--cyan); animation: neonFlicker 5s infinite; letter-spacing: .05em; }
+.logo { font-family: var(--neon); font-weight: 700; font-size: clamp(2.5rem, 8vw, 6rem); color: var(--ice); text-shadow: 0 0 5px #fff, 0 0 15px var(--cyan), 0 0 35px var(--cyan), 0 0 70px var(--cyan); animation: neonFlicker 5s infinite; letter-spacing: .05em; }
 .logo span { color: var(--pink); text-shadow: 0 0 5px #fff, 0 0 15px var(--pink), 0 0 35px var(--pink), 0 0 70px var(--pink); margin-left: .2em; }
 @keyframes neonFlicker { 0%, 18%, 22%, 25%, 53%, 57%, 100% { opacity: 1; } 20%, 24%, 55% { opacity: .55; } }
 .freq { font-family: var(--display); color: var(--cyan); letter-spacing: .25em; margin-top: .5rem; font-size: .9rem; }
@@ -46,14 +46,14 @@ body { background: var(--night); color: var(--ice); font-family: var(--body); fo
 .np { flex: 1; min-width: 0; }
 .label { font-family: var(--display); font-size: .75rem; letter-spacing: .15em; color: var(--cyan); }
 .live-dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; background: var(--pink); box-shadow: 0 0 10px var(--pink); animation: neonFlicker 1.5s infinite; vertical-align: middle; }
-.track { font-family: var(--display); font-size: clamp(1.1rem, 2.5vw, 1.6rem); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin: .3rem 0; }
+.track { font-family: var(--display); font-weight: 700; font-size: clamp(1.1rem, 2.5vw, 1.6rem); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin: .3rem 0; }
 .ded { color: #b892ff; font-style: italic; min-height: 1.2em; }
 input[type=range] { accent-color: var(--pink); width: 120px; }
 #viz { display: block; width: 100%; height: 110px; margin-top: 1rem; }
 
 .panels { width: min(960px, 92vw); margin: 0 auto 3rem; display: grid; grid-template-columns: 1.2fr 1fr; gap: 1.5rem; }
 .panel { background: rgba(11,0,25,.78); border: 2px solid var(--purple); border-radius: 16px; padding: 1.5rem; box-shadow: 0 0 25px rgba(123,44,191,.4); backdrop-filter: blur(6px); }
-.panel h2 { font-family: var(--display); font-size: 1.1rem; letter-spacing: .2em; color: var(--pink); text-shadow: 0 0 10px var(--pink); margin-bottom: 1rem; }
+.panel h2 { font-family: var(--display); font-weight: 700; font-size: 1.1rem; letter-spacing: .2em; color: var(--pink); text-shadow: 0 0 10px var(--pink); margin-bottom: 1rem; }
 .req-form { display: grid; grid-template-columns: 1fr 1fr; gap: .6rem; margin-bottom: 1.2rem; }
 .req-form input { background: rgba(5,217,232,.06); border: 1px solid rgba(5,217,232,.4); color: var(--ice); font: 600 1rem var(--body); padding: .7rem .8rem; border-radius: 8px; outline: none; transition: box-shadow .3s; }
 .req-form input:focus { box-shadow: 0 0 12px var(--cyan); }

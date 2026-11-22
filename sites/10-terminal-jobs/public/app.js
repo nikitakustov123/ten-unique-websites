@@ -5,7 +5,7 @@ const PS1_HTML = ps1.innerHTML;
 async function api(url, opts = {}) {
   const res = await fetch(url, { headers: { 'Content-Type': 'application/json' }, ...opts });
   const data = await res.json();
-  if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
+  if (!res.ok) throw new Error(data.error || `ошибка HTTP ${res.status}`);
   return data;
 }
 
@@ -33,13 +33,13 @@ async function type(text, cls = '', speed = 8) {
   return d;
 }
 const pad = (s, n) => String(s).padEnd(n).slice(0, n);
-const salary = (j) => (j.salary_min || j.salary_max ? `€${j.salary_min ?? '?'}–${j.salary_max ?? '?'}k` : 'n/a');
-const ago = (iso) => { const d = Math.floor((Date.now() - new Date(iso.replace(' ', 'T') + 'Z')) / 86400000); return d <= 0 ? 'today' : `${d}d ago`; };
+const salary = (j) => (j.salary_min || j.salary_max ? `${j.salary_min ?? '?'}–${j.salary_max ?? '?'}к ₽` : 'н/д');
+const ago = (iso) => { const d = Math.floor((Date.now() - new Date(iso.replace(' ', 'T') + 'Z')) / 86400000); return d <= 0 ? 'сегодня' : `${d} дн. назад`; };
 
 // ---------- Interactive prompts (used by apply / post wizards) ----------
 let pending = null;
 function ask(question, { optional = false } = {}) {
-  ps1.textContent = `${question}${optional ? ' (optional)' : ''} >`;
+  ps1.textContent = `${question}${optional ? ' (необязательно)' : ''} >`;
   ps1.className = 'c-amb';
   return new Promise((resolve, reject) => { pending = { resolve, reject, question }; });
 }
@@ -47,91 +47,94 @@ function resetPrompt() { ps1.innerHTML = PS1_HTML; ps1.className = ''; pending =
 
 // ---------- Commands ----------
 const COMMANDS = {
-  help: { desc: 'show this help', run: () => {
-    line({ t: 'Available commands:', c: 'c-wh' });
+  help: { desc: 'показать эту справку', run: () => {
+    line({ t: 'Доступные команды:', c: 'c-wh' });
     Object.entries(COMMANDS).forEach(([k, v]) => line([{ t: '  ' + pad(k, 10), c: 'c-cy' }, { t: v.desc, c: 'c-dim' }]));
-    line([{ t: 'Flags for ls: ', c: 'c-dim' }, '--remote  --level=junior|middle|senior|lead']);
-    line({ t: 'Tips: ↑/↓ history · Tab autocomplete · Ctrl+C cancel · click any [id] to open it', c: 'c-dim' });
+    line([{ t: 'Флаги для ls: ', c: 'c-dim' }, '--remote  --level=junior|middle|senior|lead']);
+    line({ t: 'Подсказки: ↑/↓ история · Tab автодополнение · Ctrl+C отмена · кликните по [id], чтобы открыть', c: 'c-dim' });
   } },
-  ls: { desc: 'list jobs  (ls --remote, ls --level=senior)', run: async (args) => {
+  ls: { desc: 'список вакансий  (ls --remote, ls --level=senior)', run: async (args) => {
     const p = new URLSearchParams();
     if (args.includes('--remote')) p.set('remote', '1');
     const lvl = args.find((a) => a.startsWith('--level='));
     if (lvl) p.set('level', lvl.split('=')[1]);
     printJobs(await api(`/api/jobs?${p}`));
   } },
-  search: { desc: 'search <term> — by title, company, stack or city', run: async (args) => {
-    if (!args.length) return line({ t: 'usage: search <term>', c: 'c-err' });
+  search: { desc: 'search <запрос> — по должности, компании, стеку или городу', run: async (args) => {
+    if (!args.length) return line({ t: 'использование: search <запрос>', c: 'c-err' });
     printJobs(await api(`/api/jobs?q=${encodeURIComponent(args.join(' '))}`));
   } },
-  cat: { desc: 'cat <id> — show the full job description', run: async ([id]) => {
-    if (!id) return line({ t: 'usage: cat <id>', c: 'c-err' });
+  cat: { desc: 'cat <id> — полное описание вакансии', run: async ([id]) => {
+    if (!id) return line({ t: 'использование: cat <id>', c: 'c-err' });
     const j = await api(`/api/jobs/${encodeURIComponent(id)}`);
     line({ t: `┌─ #${j.id} ${'─'.repeat(50)}`, c: 'c-dim' });
     line([{ t: '│ ', c: 'c-dim' }, { t: j.title, c: 'c-wh' }, ' @ ', { t: j.company, c: 'c-amb' }]);
-    line([{ t: '│ ', c: 'c-dim' }, `📍 ${j.location}${j.remote ? ' · remote ok' : ''} · ${j.level} · ${salary(j)} · posted ${ago(j.created_at)}`]);
-    line([{ t: '│ ', c: 'c-dim' }, { t: 'stack: ', c: 'c-dim' }, { t: j.stack.join(' · '), c: 'c-cy' }]);
+    line([{ t: '│ ', c: 'c-dim' }, `📍 ${j.location}${j.remote ? ' · можно удалённо' : ''} · ${j.level} · ${salary(j)} · опубликовано ${ago(j.created_at)}`]);
+    line([{ t: '│ ', c: 'c-dim' }, { t: 'стек: ', c: 'c-dim' }, { t: j.stack.join(' · '), c: 'c-cy' }]);
     line({ t: '│', c: 'c-dim' });
     await type(`│ ${j.description}`, 'c-ok', 4);
     line({ t: '│', c: 'c-dim' });
-    line([{ t: '│ ', c: 'c-dim' }, `${j.applicants} applicant(s) so far → `, { t: `apply ${j.id}`, cmd: `apply ${j.id}` }]);
+    line([{ t: '│ ', c: 'c-dim' }, `откликов: ${j.applicants} → `, { t: `apply ${j.id}`, cmd: `apply ${j.id}` }]);
     line({ t: `└${'─'.repeat(56)}`, c: 'c-dim' });
   } },
-  apply: { desc: 'apply <id> — interactive application', run: async ([id]) => {
-    if (!id) return line({ t: 'usage: apply <id>', c: 'c-err' });
+  apply: { desc: 'apply <id> — откликнуться (пошагово)', run: async ([id]) => {
+    if (!id) return line({ t: 'использование: apply <id>', c: 'c-err' });
     const j = await api(`/api/jobs/${encodeURIComponent(id)}`);
-    line([{ t: `Applying to `, c: 'c-dim' }, { t: `${j.title} @ ${j.company}`, c: 'c-wh' }, { t: ' (Ctrl+C to abort)', c: 'c-dim' }]);
-    const name = await ask('name');
+    line([{ t: `Отклик на вакансию `, c: 'c-dim' }, { t: `${j.title} @ ${j.company}`, c: 'c-wh' }, { t: ' (Ctrl+C — отмена)', c: 'c-dim' }]);
+    const name = await ask('имя');
     const email = await ask('email');
-    const github = await ask('github url', { optional: true });
-    const message = await ask('why you? (one line)');
-    await progress('submitting application');
+    const github = await ask('ссылка на github', { optional: true });
+    const message = await ask('почему вы? (одной строкой)');
+    await progress('отправляем отклик');
     const r = await api(`/api/jobs/${j.id}/apply`, { method: 'POST', body: JSON.stringify({ name, email, github, message }) });
-    line({ t: `✔ application #${r.id} sent to ${j.company}. good luck, ${name}! 🚀`, c: 'c-ok' });
+    line({ t: `✔ отклик #${r.id} отправлен в ${j.company}. удачи, ${name}! 🚀`, c: 'c-ok' });
     loadMini();
   } },
-  post: { desc: 'post — publish a new job (interactive)', run: async () => {
-    line({ t: 'Posting a new job. Ctrl+C to abort.', c: 'c-dim' });
+  post: { desc: 'post — опубликовать вакансию (пошагово)', run: async () => {
+    line({ t: 'Публикуем новую вакансию. Ctrl+C — отмена.', c: 'c-dim' });
     const body = {};
-    body.title = await ask('job title');
-    body.company = await ask('company');
-    body.location = await ask('location');
-    body.remote = await ask('remote? (y/n)');
-    body.level = await ask('level [junior|middle|senior|lead]');
-    body.stack = await ask('stack (comma separated)');
-    body.salary_min = await ask('salary min, k€', { optional: true });
-    body.salary_max = await ask('salary max, k€', { optional: true });
-    body.description = await ask('description');
-    body.contact_email = await ask('contact email (kept private)');
-    await progress('publishing');
+    body.title = await ask('должность');
+    body.company = await ask('компания');
+    body.location = await ask('город');
+    body.remote = await ask('удалёнка? (д/н)');
+    body.level = await ask('уровень [junior|middle|senior|lead]');
+    body.stack = await ask('стек (через запятую)');
+    body.salary_min = await ask('зарплата от, тыс. ₽', { optional: true });
+    body.salary_max = await ask('зарплата до, тыс. ₽', { optional: true });
+    body.description = await ask('описание');
+    body.contact_email = await ask('email для связи (не публикуется)');
+    await progress('публикуем');
     const r = await api('/api/jobs', { method: 'POST', body: JSON.stringify(body) });
-    line([{ t: `✔ job #${r.id} is live → `, c: 'c-ok' }, { t: `cat ${r.id}`, cmd: `cat ${r.id}` }]);
+    line([{ t: `✔ вакансия #${r.id} опубликована → `, c: 'c-ok' }, { t: `cat ${r.id}`, cmd: `cat ${r.id}` }]);
     loadMini();
   } },
-  stats: { desc: 'board statistics', run: async () => {
+  stats: { desc: 'статистика доски', run: async () => {
     const s = await api('/api/stats');
-    line([{ t: 'jobs         ', c: 'c-dim' }, { t: String(s.jobs), c: 'c-wh' }]);
-    line([{ t: 'remote       ', c: 'c-dim' }, { t: `${s.remote} (${Math.round((s.remote / s.jobs) * 100)}%)`, c: 'c-wh' }]);
-    line([{ t: 'applications ', c: 'c-dim' }, { t: String(s.applications), c: 'c-wh' }]);
-    line([{ t: 'avg salary   ', c: 'c-dim' }, { t: `€${s.avg_salary_k}k`, c: 'c-wh' }]);
-    line({ t: 'top stack:', c: 'c-dim' });
+    line([{ t: 'вакансий        ', c: 'c-dim' }, { t: String(s.jobs), c: 'c-wh' }]);
+    line([{ t: 'удалённых       ', c: 'c-dim' }, { t: `${s.remote} (${Math.round((s.remote / s.jobs) * 100)}%)`, c: 'c-wh' }]);
+    line([{ t: 'откликов        ', c: 'c-dim' }, { t: String(s.applications), c: 'c-wh' }]);
+    line([{ t: 'средняя з/п     ', c: 'c-dim' }, { t: `${s.avg_salary_k} тыс. ₽`, c: 'c-wh' }]);
+    line({ t: 'популярный стек:', c: 'c-dim' });
     const max = s.top_stack[0]?.[1] || 1;
     s.top_stack.forEach(([t, n]) => line([{ t: '  ' + pad(t, 12), c: 'c-cy' }, { t: '█'.repeat(Math.round((n / max) * 24)), c: 'bar' }, ` ${n}`]));
   } },
-  whoami: { desc: 'who are you?', run: () => line('guest — a curious developer looking for the next adventure.') },
-  matrix: { desc: 'take the red pill', run: () => { matrixRain(); line({ t: 'Wake up, Neo…', c: 'c-ok' }); } },
-  clear: { desc: 'clear the screen', run: () => out.replaceChildren() },
+  whoami: { desc: 'кто вы?', run: () => line('guest — любопытный разработчик в поиске нового приключения.') },
+  matrix: { desc: 'выбрать красную таблетку', run: () => { matrixRain(); line({ t: 'Проснись, Нео…', c: 'c-ok' }); } },
+  clear: { desc: 'очистить экран', run: () => out.replaceChildren() },
 };
 
+// Russian aliases for the main commands
+const ALIASES = { 'помощь': 'help', 'вакансии': 'ls', 'поиск': 'search', 'открыть': 'cat', 'отклик': 'apply', 'разместить': 'post', 'статистика': 'stats', 'очистить': 'clear' };
+
 function printJobs(jobs) {
-  if (!jobs.length) return line({ t: 'no jobs found. try `ls` or another search.', c: 'c-amb' });
-  line({ t: `${pad('ID', 5)}${pad('TITLE', 32)}${pad('COMPANY', 18)}${pad('WHERE', 16)}${pad('LEVEL', 8)}SALARY`, c: 'c-dim' });
+  if (!jobs.length) return line({ t: 'ничего не найдено. попробуйте `ls` или другой запрос.', c: 'c-amb' });
+  line({ t: `${pad('ID', 5)}${pad('ДОЛЖНОСТЬ', 32)}${pad('КОМПАНИЯ', 18)}${pad('ГДЕ', 19)}${pad('УРОВЕНЬ', 9)}ЗАРПЛАТА`, c: 'c-dim' });
   jobs.forEach((j) => line([
     { t: `[${j.id}]`, cmd: `cat ${j.id}` }, ' '.repeat(Math.max(1, 5 - `[${j.id}]`.length)),
     { t: pad(j.title, 32), c: 'c-wh' }, { t: pad(j.company, 18), c: 'c-amb' },
-    pad(`${j.remote ? '🌍 ' : ''}${j.location}`, 16), pad(j.level, 8), { t: salary(j), c: 'c-cy' },
+    pad(`${j.remote ? '🌍 ' : ''}${j.location}`, 18) + ' ', pad(j.level, 9), { t: salary(j), c: 'c-cy' },
   ]));
-  line({ t: `${jobs.length} job(s). type \`cat <id>\` or click an [id].`, c: 'c-dim' });
+  line({ t: `вакансий: ${jobs.length}. введите \`cat <id>\` или кликните по [id].`, c: 'c-dim' });
 }
 async function progress(label) {
   const d = line('', 'c-dim');
@@ -153,8 +156,8 @@ async function run(raw) {
   if (!cmdline) return;
   history.push(cmdline); hIdx = history.length;
   const [name, ...args] = cmdline.split(/\s+/);
-  const cmd = COMMANDS[name.toLowerCase()];
-  if (!cmd) return line({ t: `${name}: command not found. type \`help\`.`, c: 'c-err' });
+  const cmd = COMMANDS[ALIASES[name.toLowerCase()] || name.toLowerCase()];
+  if (!cmd) return line({ t: `${name}: команда не найдена. введите \`help\`.`, c: 'c-err' });
   busy = true;
   try { await cmd.run(args); }
   catch (e) { if (e !== 'SIGINT') line({ t: `error: ${e.message}`, c: 'c-err' }); }
@@ -188,7 +191,7 @@ async function loadMini() {
   $('#mini').replaceChildren(...jobs.map((j, i) => {
     const li = document.createElement('li');
     const b = document.createElement('b'); b.textContent = `[${j.id}] ${j.title}`;
-    const s = document.createElement('small'); s.textContent = `${j.company} · ${j.remote ? 'remote' : j.location} · ${salary(j)}`;
+    const s = document.createElement('small'); s.textContent = `${j.company} · ${j.remote ? 'удалённо' : j.location} · ${salary(j)}`;
     li.append(b, s); li.style.animationDelay = `${i * 60}ms`;
     li.onclick = () => run(`cat ${j.id}`);
     return li;
@@ -222,10 +225,10 @@ function matrixRain() {
     '  | |  __/ |  | | | | | | | | | | (_| | | | |_| | (_) | |_) \\__ \\',
     '  |_|\\___|_|  |_| |_| |_|_|_| |_|\\__,_|_|  \\___/ \\___/|_.__/|___/',
   ];
-  for (const l of ['[ OK ] mounting /dev/jobs', '[ OK ] connecting to sqlite://jobs.db', '[ OK ] loading opportunities']) { line(l, 'c-dim'); await sleep(180); }
+  for (const l of ['[ OK ] монтируем /dev/jobs', '[ OK ] подключаемся к sqlite://jobs.db', '[ OK ] загружаем вакансии']) { line(l, 'c-dim'); await sleep(180); }
   logo.forEach((l) => line(l, 'ascii'));
-  await type('Welcome to Terminal Jobs — dev jobs for people who live in the shell.', 'c-wh', 12);
-  line([{ t: 'Type ', c: 'c-dim' }, { t: 'help', cmd: 'help' }, { t: ' to begin, or ', c: 'c-dim' }, { t: 'ls', cmd: 'ls' }, { t: ' to see all open roles.', c: 'c-dim' }]);
+  await type('Добро пожаловать в Terminal Jobs — вакансии для тех, кто живёт в терминале.', 'c-wh', 12);
+  line([{ t: 'Введите ', c: 'c-dim' }, { t: 'help', cmd: 'help' }, { t: ', чтобы начать, или ', c: 'c-dim' }, { t: 'ls', cmd: 'ls' }, { t: ', чтобы увидеть все вакансии.', c: 'c-dim' }]);
   busy = false;
   input.focus();
   loadMini();

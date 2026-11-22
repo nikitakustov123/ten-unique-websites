@@ -9,8 +9,8 @@
   --white: #ffffff;
   --b: 4px solid var(--ink);
   --shadow: 8px 8px 0 var(--ink);
-  --display: 'Archivo Black', Impact, sans-serif;
-  --mono: 'Space Mono', ui-monospace, monospace;
+  --display: 'Unbounded', Impact, sans-serif;
+  --mono: 'IBM Plex Mono', ui-monospace, monospace;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: var(--mono); background: var(--paper); color: var(--ink); min-height: 100vh;
@@ -31,7 +31,7 @@ body::before { content: ''; position: fixed; inset: 0; background: rgba(244,240,
 .btn-new { background: var(--pink); }
 .btn-danger { background: var(--ink); color: var(--white); }
 
-.ticker { overflow: hidden; border-bottom: var(--b); background: var(--ink); color: var(--yellow); font-family: var(--display); font-size: 1.2rem; padding: .5rem 0; white-space: nowrap; }
+.ticker { overflow: hidden; border-bottom: var(--b); background: var(--ink); color: var(--yellow); font-family: var(--display); font-size: 1rem; padding: .5rem 0; white-space: nowrap; }
 .ticker div { display: inline-block; animation: tick 18s linear infinite; }
 @keyframes tick { to { transform: translateX(-50%); } }
 
@@ -51,7 +51,7 @@ body::before { content: ''; position: fixed; inset: 0; background: rgba(244,240,
 @keyframes drop { from { opacity: 0; transform: translateY(-60px) rotate(8deg); } }
 .note.yellow { background: var(--yellow); } .note.pink { background: var(--pink); } .note.blue { background: var(--blue); }
 .note.green { background: var(--green); } .note.orange { background: var(--orange); } .note.white { background: var(--white); }
-.note h3 { font-family: var(--display); font-size: 1.5rem; line-height: 1.1; margin-bottom: .7rem; word-break: break-word; padding-right: 2.2rem; }
+.note h3 { font-family: var(--display); font-size: 1.25rem; line-height: 1.1; margin-bottom: .7rem; word-break: break-word; padding-right: 2.2rem; }
 .note p { white-space: pre-wrap; word-break: break-word; line-height: 1.5; }
 .note .meta { display: flex; justify-content: space-between; align-items: end; gap: .5rem; margin-top: 1rem; flex-wrap: wrap; }
 .note .chips span { display: inline-block; font-size: .75rem; font-weight: 700; border: 2px solid var(--ink); background: var(--white); padding: 0 .4rem; margin: 0 .3rem .3rem 0; }
@@ -68,7 +68,7 @@ dialog[open] { animation: slam .35s cubic-bezier(.3,1.7,.5,1); }
 dialog::backdrop { background: rgba(255, 225, 77, .7); backdrop-filter: grayscale(1); }
 #noteForm { display: grid; gap: 1rem; padding: 1.5rem; }
 .dlg-head { display: flex; justify-content: space-between; align-items: center; }
-.dlg-head h2 { font-family: var(--display); font-size: 2rem; }
+.dlg-head h2 { font-family: var(--display); font-size: 1.6rem; }
 .x { border: 3px solid var(--ink); background: var(--pink); width: 2.5rem; height: 2.5rem; font-size: 1.2rem; cursor: pointer; }
 #noteForm input:not([type=radio]):not([type=checkbox]), #noteForm textarea { font: 1rem var(--mono); border: 3px solid var(--ink); padding: .8rem; outline: none; background: var(--paper); }
 #noteForm input[name=title] { font: 1.4rem var(--display); }

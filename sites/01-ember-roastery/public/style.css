@@ -6,7 +6,7 @@
   --milk: #fff8ee;
   --ember: #e0682b;
   --muted: #a58b74;
-  --serif: 'Fraunces', Georgia, serif;
+  --serif: 'Playfair Display', Georgia, serif;
   --sans: 'Inter', system-ui, sans-serif;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -37,7 +37,7 @@ em { font-style: italic; color: var(--crema); }
 .hero { min-height: 88vh; display: grid; grid-template-columns: 1.2fr 1fr; align-items: center; gap: 4rem; padding: 4rem 5vw; position: relative;
   background: radial-gradient(ellipse at 75% 50%, rgba(224,104,43,.18), transparent 55%); }
 .eyebrow { text-transform: uppercase; letter-spacing: .25em; font-size: .75rem; color: var(--crema); margin-bottom: 1.5rem; }
-.hero h1 { font-family: var(--serif); font-weight: 300; font-size: clamp(2.8rem, 6vw, 5.5rem); line-height: 1.02; letter-spacing: -.03em; }
+.hero h1 { font-family: var(--serif); font-weight: 400; font-size: clamp(2.6rem, 5.4vw, 5rem); line-height: 1.02; letter-spacing: -.03em; }
 .hero h1, .hero .lead, .hero-actions, .eyebrow { opacity: 0; transform: translateY(30px); animation: rise 1s cubic-bezier(.2,.7,.2,1) forwards; }
 .hero h1 { animation-delay: .15s; } .hero .lead { animation-delay: .3s; } .hero-actions { animation-delay: .45s; }
 @keyframes rise { to { opacity: 1; transform: none; } }

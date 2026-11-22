@@ -1,12 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Verdant — Plants that love you back</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet" />
+  <title>Verdant — растения, которые любят вас в ответ</title>
+  <link rel="stylesheet" href="fonts/fonts.css" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -14,16 +12,16 @@
 
   <header class="nav">
     <a href="#" class="logo">verdant<span>.</span></a>
-    <nav><a href="#shop">Shop</a><a href="#match">Plant match</a><a href="#club">Club</a></nav>
-    <button class="wish-btn" id="wishBtn">♡ <span id="wishCount">0</span></button>
+    <nav><a href="#shop">Каталог</a><a href="#match">Подбор растения</a><a href="#club">Клуб</a></nav>
+    <button class="wish-btn" id="wishBtn" aria-label="Избранное">♡ <span id="wishCount">0</span></button>
   </header>
 
   <section class="hero">
     <div class="hero-text">
-      <span class="pill">🌱 Free delivery over $50</span>
-      <h1>Grow a little <em>calm</em> at home.</h1>
-      <p>Hand-raised houseplants from our greenhouse in the valley, delivered in compostable pots with a lifetime of care advice.</p>
-      <div class="hero-cta"><a href="#match" class="btn">Find my plant</a><a href="#shop" class="link">Browse all →</a></div>
+      <span class="pill">🌱 Бесплатная доставка от 5 000 ₽</span>
+      <h1>Вырастите немного <em>спокойствия</em> дома.</h1>
+      <p>Комнатные растения из нашей теплицы в долине: доставим в компостируемых горшках и подскажем, как ухаживать, всю жизнь.</p>
+      <div class="hero-cta"><a href="#match" class="btn">Подобрать растение</a><a href="#shop" class="link">Весь каталог →</a></div>
     </div>
     <div class="pot-scene" aria-hidden="true">
       <div class="plant">
@@ -37,69 +35,69 @@
 
   <section id="shop" class="section">
     <div class="head">
-      <h2>The greenhouse</h2>
-      <select id="sort" aria-label="Sort">
-        <option value="name">A → Z</option>
-        <option value="price_asc">Price: low to high</option>
-        <option value="price_desc">Price: high to low</option>
-        <option value="easy">Easiest first</option>
+      <h2>Наша теплица</h2>
+      <select id="sort" aria-label="Сортировка">
+        <option value="name">По алфавиту</option>
+        <option value="price_asc">Сначала дешевле</option>
+        <option value="price_desc">Сначала дороже</option>
+        <option value="easy">Сначала простые в уходе</option>
       </select>
     </div>
     <div class="filters" id="filters">
-      <input type="search" id="q" placeholder="Search plants…" />
-      <button class="chip" data-k="light" data-v="low">☁️ Low light</button>
-      <button class="chip" data-k="light" data-v="bright">☀️ Bright light</button>
-      <button class="chip" data-k="pet_safe" data-v="1">🐾 Pet safe</button>
-      <button class="chip" data-k="easy" data-v="1">😌 Beginner</button>
-      <button class="chip" data-k="size" data-v="small">Small</button>
-      <button class="chip" data-k="size" data-v="large">Large</button>
+      <input type="search" id="q" placeholder="Поиск растений…" />
+      <button class="chip" data-k="light" data-v="low">☁️ Мало света</button>
+      <button class="chip" data-k="light" data-v="bright">☀️ Яркий свет</button>
+      <button class="chip" data-k="pet_safe" data-v="1">🐾 Безопасно для питомцев</button>
+      <button class="chip" data-k="easy" data-v="1">😌 Для новичков</button>
+      <button class="chip" data-k="size" data-v="small">Маленькие</button>
+      <button class="chip" data-k="size" data-v="large">Большие</button>
     </div>
     <div class="grid" id="grid"></div>
   </section>
 
   <section id="match" class="section match">
     <div class="match-card">
-      <h2>Plant match <em>quiz</em></h2>
+      <h2>Квиз: <em>ваше растение</em></h2>
       <form id="quiz">
-        <fieldset><legend>How much light does your space get?</legend>
-          <label><input type="radio" name="light" value="low" required />Mostly shade</label>
-          <label><input type="radio" name="light" value="medium" />Some indirect sun</label>
-          <label><input type="radio" name="light" value="bright" />Sunny window</label>
+        <fieldset><legend>Сколько света в комнате?</legend>
+          <label><input type="radio" name="light" value="low" required />В основном тень</label>
+          <label><input type="radio" name="light" value="medium" />Рассеянный свет</label>
+          <label><input type="radio" name="light" value="bright" />Солнечное окно</label>
         </fieldset>
-        <fieldset><legend>How often will you water?</legend>
-          <label><input type="radio" name="water" value="rarely" required />I forget…</label>
-          <label><input type="radio" name="water" value="weekly" />Once a week</label>
-          <label><input type="radio" name="water" value="often" />I love misting</label>
+        <fieldset><legend>Как часто будете поливать?</legend>
+          <label><input type="radio" name="water" value="rarely" required />Я забываю…</label>
+          <label><input type="radio" name="water" value="weekly" />Раз в неделю</label>
+          <label><input type="radio" name="water" value="often" />Обожаю опрыскивать</label>
         </fieldset>
-        <fieldset><legend>Pets at home?</legend>
-          <label><input type="radio" name="pets" value="yes" required />Yes</label>
-          <label><input type="radio" name="pets" value="no" />No</label>
+        <fieldset><legend>Есть ли дома питомцы?</legend>
+          <label><input type="radio" name="pets" value="yes" required />Да</label>
+          <label><input type="radio" name="pets" value="no" />Нет</label>
         </fieldset>
-        <fieldset><legend>Your plant experience?</legend>
-          <label><input type="radio" name="experience" value="1" required />Beginner</label>
-          <label><input type="radio" name="experience" value="2" />Some</label>
-          <label><input type="radio" name="experience" value="3" />Green thumb</label>
+        <fieldset><legend>Ваш опыт с растениями?</legend>
+          <label><input type="radio" name="experience" value="1" required />Новичок</label>
+          <label><input type="radio" name="experience" value="2" />Немного есть</label>
+          <label><input type="radio" name="experience" value="3" />Зелёные руки</label>
         </fieldset>
-        <button class="btn" type="submit">Show my matches</button>
+        <button class="btn" type="submit">Показать подходящие</button>
       </form>
       <div class="matches" id="matches"></div>
     </div>
   </section>
 
   <section id="club" class="section club">
-    <h2>Join the Verdant club</h2>
-    <p>Seasonal care tips, rare-plant drops and 10% off your first order.</p>
+    <h2>Вступайте в клуб Verdant</h2>
+    <p>Сезонные советы по уходу, редкие растения в первую очередь и скидка 10% на первый заказ.</p>
     <form id="subForm" class="sub-form">
       <input type="email" name="email" placeholder="you@example.com" required maxlength="120" />
-      <button class="btn" type="submit">Subscribe</button>
+      <button class="btn" type="submit">Подписаться</button>
     </form>
     <p class="community" id="community"></p>
   </section>
 
-  <footer class="footer">verdant<span>.</span> plant studio — grown with care · 2026</footer>
+  <footer class="footer">verdant<span>.</span> студия растений — выращено с заботой · 2026</footer>
 
   <aside class="panel" id="panel" aria-hidden="true">
-    <button class="close" id="closePanel" aria-label="Close">×</button>
+    <button class="close" id="closePanel" aria-label="Закрыть">×</button>
     <div id="panelBody"></div>
   </aside>
   <div class="scrim" id="scrim"></div>

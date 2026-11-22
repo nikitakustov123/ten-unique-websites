@@ -1,4 +1,4 @@
-// Verdant Plant Studio — plant catalog with filters, plant-match quiz, wishlist and newsletter.
+// Verdant — студия растений: каталог с фильтрами, квиз-подбор, избранное и рассылка.
 import express from 'express';
 import { DatabaseSync } from 'node:sqlite';
 import { mkdirSync } from 'node:fs';
@@ -10,6 +10,11 @@ const PORT = Number(process.env.PORT) || 3004;
 
 mkdirSync(path.join(__dirname, 'data'), { recursive: true });
 const db = new DatabaseSync(path.join(__dirname, 'data', 'verdant.db'));
+
+// SQLite's built-in LIKE is case-insensitive only for ASCII. Override it so that
+// search also ignores case for Cyrillic ("суп" finds "Суп").
+const likeRe = (p) => new RegExp('^' + p.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/%/g, '[\\s\\S]*').replace(/_/g, '[\\s\\S]') + '$', 'iu');
+db.function('like', { deterministic: true }, (p, v) => (p == null || v == null ? null : likeRe(String(p)).test(String(v)) ? 1 : 0));
 db.exec(`
   PRAGMA journal_mode = WAL;
   PRAGMA foreign_keys = ON;
@@ -43,18 +48,18 @@ db.exec(`
 if (db.prepare('SELECT COUNT(*) AS n FROM plants').get().n === 0) {
   const ins = db.prepare('INSERT INTO plants (name, latin, emoji, light, water, difficulty, pet_safe, size, price_cents, stock, description) VALUES (?,?,?,?,?,?,?,?,?,?,?)');
   [
-    ['Snake Plant', 'Dracaena trifasciata', '🪴', 'low', 'rarely', 1, 0, 'medium', 3400, 14, 'Nearly indestructible. Thrives on neglect and purifies the air while you sleep.'],
-    ['ZZ Plant', 'Zamioculcas zamiifolia', '🌿', 'low', 'rarely', 1, 0, 'medium', 3900, 9, 'Glossy, architectural leaves that forgive forgotten waterings for weeks.'],
-    ['Calathea Orbifolia', 'Goeppertia orbifolia', '🍃', 'medium', 'often', 3, 1, 'medium', 4800, 5, 'Silver-striped leaves that fold up at night like hands in prayer.'],
-    ['Monstera Deliciosa', 'Monstera deliciosa', '🌱', 'bright', 'weekly', 2, 0, 'large', 6500, 7, 'The iconic split-leaf giant. Give it a pole and it will climb for you.'],
-    ['Boston Fern', 'Nephrolepis exaltata', '🌾', 'medium', 'often', 2, 1, 'medium', 2900, 11, 'Feathery fronds that love humid bathrooms and misty mornings.'],
-    ['Parlor Palm', 'Chamaedorea elegans', '🌴', 'low', 'weekly', 1, 1, 'large', 5200, 6, 'A soft, Victorian-era classic that is safe for curious cats and dogs.'],
-    ['Fiddle Leaf Fig', 'Ficus lyrata', '🌳', 'bright', 'weekly', 3, 0, 'large', 8900, 3, 'Dramatic violin-shaped leaves. A diva — but worth every bit of attention.'],
-    ['Peperomia Hope', 'Peperomia tetraphylla', '☘️', 'medium', 'rarely', 1, 1, 'small', 1900, 20, 'Trailing coin-like leaves, perfect for shelves and tiny apartments.'],
-    ['String of Pearls', 'Curio rowleyanus', '🫛', 'bright', 'rarely', 2, 0, 'small', 2400, 8, 'A cascading succulent necklace for sunny windowsills.'],
-    ['Pothos Marble Queen', 'Epipremnum aureum', '🍀', 'low', 'weekly', 1, 0, 'small', 2200, 16, 'Cream-marbled vines that grow fast and root in a glass of water.'],
-    ['Bird of Paradise', 'Strelitzia nicolai', '🦜', 'bright', 'weekly', 2, 0, 'large', 9900, 4, 'Tropical paddles that bring a resort feeling to any living room.'],
-    ['Spider Plant', 'Chlorophytum comosum', '🕸️', 'medium', 'weekly', 1, 1, 'small', 1700, 18, 'Cheerful arching leaves and baby plantlets you can share with friends.'],
+    ['Сансевиерия', 'Dracaena trifasciata', '🪴', 'low', 'rarely', 1, 0, 'medium', 249000, 14, 'Практически неубиваемая. Прекрасно переносит забывчивость и очищает воздух, пока вы спите.'],
+    ['Замиокулькас', 'Zamioculcas zamiifolia', '🌿', 'low', 'rarely', 1, 0, 'medium', 279000, 9, 'Глянцевые архитектурные листья, которые прощают пропущенные поливы неделями.'],
+    ['Калатея Орбифолия', 'Goeppertia orbifolia', '🍃', 'medium', 'often', 3, 1, 'medium', 359000, 5, 'Листья с серебристыми полосами, которые на ночь складываются, будто ладони в молитве.'],
+    ['Монстера деликатесная', 'Monstera deliciosa', '🌱', 'bright', 'weekly', 2, 0, 'large', 490000, 7, 'Знаменитый гигант с резными листьями. Дайте ей опору — и она полезет вверх.'],
+    ['Нефролепис', 'Nephrolepis exaltata', '🌾', 'medium', 'often', 2, 1, 'medium', 219000, 11, 'Пушистые вайи, которые обожают влажные ванные комнаты и туманные утра.'],
+    ['Хамедорея', 'Chamaedorea elegans', '🌴', 'low', 'weekly', 1, 1, 'large', 389000, 6, 'Мягкая викторианская классика, безопасная для любопытных кошек и собак.'],
+    ['Фикус лировидный', 'Ficus lyrata', '🌳', 'bright', 'weekly', 3, 0, 'large', 690000, 3, 'Эффектные листья в форме скрипки. Капризная дива — но она того стоит.'],
+    ['Пеперомия Хоуп', 'Peperomia tetraphylla', '☘️', 'medium', 'rarely', 1, 1, 'small', 149000, 20, 'Ампельные листья-монетки — идеально для полок и маленьких квартир.'],
+    ['Крестовник Роули', 'Curio rowleyanus', '🫛', 'bright', 'rarely', 2, 0, 'small', 179000, 8, 'Каскадное суккулентное «ожерелье» для солнечного подоконника.'],
+    ['Эпипремнум Марбл Квин', 'Epipremnum aureum', '🍀', 'low', 'weekly', 1, 0, 'small', 159000, 16, 'Лианы с кремовым мрамором: быстро растут и укореняются в стакане воды.'],
+    ['Стрелиция Николая', 'Strelitzia nicolai', '🦜', 'bright', 'weekly', 2, 0, 'large', 790000, 4, 'Тропические листья-вёсла, которые превращают гостиную в курорт.'],
+    ['Хлорофитум', 'Chlorophytum comosum', '🕸️', 'medium', 'weekly', 1, 1, 'small', 119000, 18, 'Жизнерадостные дугообразные листья и детки, которыми можно делиться с друзьями.'],
   ].forEach((p) => ins.run(...p));
 }
 
@@ -109,9 +114,9 @@ app.get('/api/wishlist', (req, res) => {
 
 app.post('/api/wishlist/:plantId', (req, res) => {
   const v = visitorId(req);
-  if (!v) return fail(res, 'Missing visitor id.');
+  if (!v) return fail(res, 'Не передан идентификатор посетителя.');
   const id = Number(req.params.plantId);
-  if (!db.prepare('SELECT 1 FROM plants WHERE id = ?').get(id)) return fail(res, 'Plant not found', 404);
+  if (!db.prepare('SELECT 1 FROM plants WHERE id = ?').get(id)) return fail(res, 'Растение не найдено', 404);
   const existing = db.prepare('SELECT 1 FROM wishlist WHERE visitor = ? AND plant_id = ?').get(v, id);
   if (existing) db.prepare('DELETE FROM wishlist WHERE visitor = ? AND plant_id = ?').run(v, id);
   else db.prepare('INSERT INTO wishlist (visitor, plant_id) VALUES (?, ?)').run(v, id);
@@ -120,12 +125,12 @@ app.post('/api/wishlist/:plantId', (req, res) => {
 
 app.post('/api/subscribe', (req, res) => {
   const email = text(req.body.email, 120);
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return fail(res, 'That email looks a little wilted.');
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return fail(res, 'Этот email выглядит немного увядшим. Проверьте его.');
   const r = db.prepare('INSERT INTO subscribers (email) VALUES (?) ON CONFLICT(email) DO NOTHING').run(email);
   const count = db.prepare('SELECT COUNT(*) AS n FROM subscribers').get().n;
   res.status(r.changes ? 201 : 200).json({ subscribed: true, already: !r.changes, community: count });
 });
 
-app.use('/api', (req, res) => fail(res, 'Not found', 404));
-app.use((err, req, res, _next) => { console.error(err); fail(res, 'Our server needs some sunlight. Try again.', 500); });
+app.use('/api', (req, res) => fail(res, 'Не найдено', 404));
+app.use((err, req, res, _next) => { console.error(err); fail(res, 'Нашему серверу не хватает солнца. Попробуйте ещё раз.', 500); });
 app.listen(PORT, () => console.log(`Verdant Plant Studio → http://localhost:${PORT}`));

@@ -1,12 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Orbit Voyages — Leave the atmosphere behind</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;800&family=Exo+2:wght@300;400;600&display=swap" rel="stylesheet" />
+  <title>Orbit Voyages — оставьте атмосферу позади</title>
+  <link rel="stylesheet" href="fonts/fonts.css" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -14,7 +12,7 @@
 
   <header class="nav">
     <a class="logo" href="#"><span class="ring"></span>ORBIT VOYAGES</a>
-    <nav><a href="#destinations">Destinations</a><a href="#how">Training</a><a href="#lookup">My mission</a></nav>
+    <nav><a href="#destinations">Направления</a><a href="#how">Подготовка</a><a href="#lookup">Моя миссия</a></nav>
   </header>
 
   <section class="hero">
@@ -25,42 +23,42 @@
       <div class="orbit o3"><span class="ship">▲</span></div>
     </div>
     <div class="hero-copy">
-      <p class="kicker">// Commercial flights now boarding</p>
-      <h1 class="glitch" data-text="BEYOND THE BLUE">BEYOND THE BLUE</h1>
-      <p class="sub">From a three-day orbital getaway to a two-year odyssey to the rings of Saturn. Your seat among the stars is waiting.</p>
-      <a href="#destinations" class="btn">Choose your destination</a>
+      <p class="kicker">// Идёт посадка на коммерческие рейсы</p>
+      <h1 class="glitch" data-text="ЗА ПРЕДЕЛАМИ НЕБА">ЗА ПРЕДЕЛАМИ НЕБА</h1>
+      <p class="sub">От трёхдневного отдыха на орбите до двухлетней одиссеи к кольцам Сатурна. Ваше место среди звёзд уже ждёт.</p>
+      <a href="#destinations" class="btn">Выбрать направление</a>
       <div class="countdown" id="countdown"></div>
     </div>
   </section>
 
   <section id="destinations" class="section">
-    <h2 class="title"><span>01</span> Destinations</h2>
+    <h2 class="title"><span>01</span> Направления</h2>
     <div class="dest-grid" id="destGrid"></div>
   </section>
 
   <section id="how" class="section how">
-    <h2 class="title"><span>02</span> Your path to orbit</h2>
+    <h2 class="title"><span>02</span> Ваш путь на орбиту</h2>
     <ol class="steps">
-      <li><b>Medical</b><p>A two-day check at our Nevada facility.</p></li>
-      <li><b>Centrifuge</b><p>Learn to love 4g with our flight surgeons.</p></li>
-      <li><b>Zero-g flights</b><p>Twelve parabolas to master floating.</p></li>
-      <li><b>Launch</b><p>Strap in. Count down. Leave the planet.</p></li>
+      <li><b>Медкомиссия</b><p>Двухдневное обследование в нашем центре подготовки.</p></li>
+      <li><b>Центрифуга</b><p>Учимся любить перегрузку 4g вместе с лётными врачами.</p></li>
+      <li><b>Полёты в невесомости</b><p>Двенадцать параболических манёвров, чтобы научиться парить.</p></li>
+      <li><b>Старт</b><p>Пристегнитесь. Обратный отсчёт. Покиньте планету.</p></li>
     </ol>
   </section>
 
   <section id="lookup" class="section">
-    <h2 class="title"><span>03</span> Mission lookup</h2>
+    <h2 class="title"><span>03</span> Поиск миссии</h2>
     <form class="lookup" id="lookupForm">
       <input name="code" placeholder="ORB-XXXXXX" maxlength="12" required />
-      <button class="btn" type="submit">Scan</button>
+      <button class="btn" type="submit">Найти</button>
     </form>
     <div id="lookupResult"></div>
   </section>
 
-  <footer class="footer">ORBIT VOYAGES · Mission Control, Earth · 2026</footer>
+  <footer class="footer">ORBIT VOYAGES · Центр управления полётами, Земля · 2026</footer>
 
   <dialog id="modal">
-    <button class="close" id="closeModal" aria-label="Close">×</button>
+    <button class="close" id="closeModal" aria-label="Закрыть">×</button>
     <div id="modalBody"></div>
   </dialog>
   <div class="toast" id="toast"></div>

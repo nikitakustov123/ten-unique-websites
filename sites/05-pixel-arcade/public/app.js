@@ -7,7 +7,7 @@ const el = (tag, props = {}, ...kids) => {
 async function api(url, opts = {}) {
   const res = await fetch(url, { headers: { 'Content-Type': 'application/json' }, ...opts });
   const data = await res.json();
-  if (!res.ok) throw new Error(data.error || 'Request failed');
+  if (!res.ok) throw new Error(data.error || 'Ошибка запроса');
   return data;
 }
 
@@ -47,7 +47,7 @@ function grid() {
 
 // ---------- Game 1: Neon Snake ----------
 const Snake = {
-  title: 'NEON SNAKE', help: 'ARROWS / WASD TO MOVE',
+  title: 'НЕОНОВАЯ ЗМЕЙКА', help: 'СТРЕЛКИ / WASD — ДВИЖЕНИЕ',
   start() {
     this.body = [{ x: 8, y: 12 }, { x: 7, y: 12 }, { x: 6, y: 12 }];
     this.dir = { x: 1, y: 0 }; this.queue = []; this.speed = 120; this.place();
@@ -91,7 +91,7 @@ const Snake = {
 
 // ---------- Game 2: Reflex Blaster (click the targets before they vanish) ----------
 const Reflex = {
-  title: 'REFLEX BLASTER', help: 'CLICK TARGETS · 30 SECONDS',
+  title: 'РЕФЛЕКС-БЛАСТЕР', help: 'КЛИКАЙ ПО МИШЕНЯМ · 30 СЕКУНД',
   start() {
     this.targets = []; this.ends = Date.now() + 30000; this.spawnAt = 0; this.misses = 0;
     const step = () => {
@@ -112,7 +112,7 @@ const Reflex = {
       }
       ctx.shadowBlur = 0; drawParticles();
       ctx.fillStyle = '#2de2e6'; ctx.font = '14px "Press Start 2P"';
-      ctx.fillText(`${Math.ceil((this.ends - now) / 1000)}s`, 16, 28);
+      ctx.fillText(`${Math.ceil((this.ends - now) / 1000)}с`, 16, 28);
       loop = requestAnimationFrame(step);
     };
     step();
@@ -142,22 +142,22 @@ function gameOver() {
   beep(220, 0.2, 'sawtooth'); setTimeout(() => beep(110, 0.35, 'sawtooth'), 180);
   cvs.parentElement.classList.add('shake'); setTimeout(() => cvs.parentElement.classList.remove('shake'), 300);
   if (scoreVal > 0 && session) { $('#initialsForm').hidden = false; $('#initialsForm').initials.focus(); }
-  else showOverlay('GAME OVER', `SCORE ${scoreVal}`);
+  else showOverlay('ИГРА ОКОНЧЕНА', `СЧЁТ ${scoreVal}`);
 }
 function showOverlay(title, text) {
   $('#ovTitle').textContent = title; $('#ovText').textContent = text;
-  $('#startBtn').textContent = 'PLAY AGAIN'; $('#overlay').hidden = false;
+  $('#startBtn').textContent = 'ЕЩЁ РАЗ'; $('#overlay').hidden = false;
 }
 $('#startBtn').onclick = startGame;
-$('#skipBtn').onclick = () => { $('#initialsForm').hidden = true; showOverlay('GAME OVER', `SCORE ${scoreVal}`); };
+$('#skipBtn').onclick = () => { $('#initialsForm').hidden = true; showOverlay('ИГРА ОКОНЧЕНА', `СЧЁТ ${scoreVal}`); };
 $('#initialsForm').addEventListener('submit', async (e) => {
   e.preventDefault();
   try {
     const r = await api('/api/scores', { method: 'POST', body: JSON.stringify({ token: session, score: scoreVal, initials: e.target.initials.value }) });
     lastSaved = r; e.target.reset(); $('#initialsForm').hidden = true;
-    showOverlay(`RANK #${r.rank}`, `${r.initials} · ${r.score} PTS SAVED`);
+    showOverlay(`МЕСТО #${r.rank}`, `${r.initials} · ${r.score} ОЧК. СОХРАНЕНО`);
     switchBoard(current); loadStats();
-  } catch (err) { showOverlay('ERROR', err.message.toUpperCase()); $('#initialsForm').hidden = true; }
+  } catch (err) { showOverlay('ОШИБКА', err.message.toUpperCase()); $('#initialsForm').hidden = true; }
 });
 
 function selectGame(id) {
@@ -165,14 +165,14 @@ function selectGame(id) {
   current = id;
   document.querySelectorAll('.pad-btn').forEach((b) => b.classList.toggle('sel', b.dataset.game === id));
   $('#gameName').textContent = GAMES[id].title;
-  $('#ovTitle').textContent = GAMES[id].title; $('#ovText').textContent = GAMES[id].help; $('#startBtn').textContent = 'PRESS START';
+  $('#ovTitle').textContent = GAMES[id].title; $('#ovText').textContent = GAMES[id].help; $('#startBtn').textContent = 'СТАРТ';
   $('#overlay').hidden = false; $('#initialsForm').hidden = true;
   grid(); switchBoard(id);
 }
 document.querySelectorAll('.pad-btn').forEach((b) => (b.onclick = () => selectGame(b.dataset.game)));
 
 addEventListener('keydown', (e) => {
-  const map = { ArrowUp: 'up', ArrowDown: 'down', ArrowLeft: 'left', ArrowRight: 'right', w: 'up', s: 'down', a: 'left', d: 'right' };
+  const map = { ArrowUp: 'up', ArrowDown: 'down', ArrowLeft: 'left', ArrowRight: 'right', w: 'up', s: 'down', a: 'left', d: 'right', ц: 'up', ы: 'down', ф: 'left', в: 'right' };
   if (document.activeElement?.name === 'initials') return;
   if (map[e.key] && running && current === 'snake') { e.preventDefault(); Snake.turn(map[e.key]); }
   if ((e.key === 'Enter' || e.key === ' ') && !running && !$('#overlay').hidden) { e.preventDefault(); startGame(); }
@@ -202,9 +202,9 @@ document.querySelectorAll('.tab').forEach((t) => (t.onclick = () => switchBoard(
 async function loadStats() {
   const s = await api('/api/stats');
   $('#stats').replaceChildren(
-    el('li', {}, 'GAMES ', el('b', { textContent: s.games_played })),
-    el('li', {}, 'PLAYERS ', el('b', { textContent: s.players })),
-    el('li', {}, 'POINTS ', el('b', { textContent: s.total_points.toLocaleString('en-US') })));
+    el('li', {}, 'ИГР ', el('b', { textContent: s.games_played })),
+    el('li', {}, 'ИГРОКОВ ', el('b', { textContent: s.players })),
+    el('li', {}, 'ОЧКОВ ', el('b', { textContent: s.total_points.toLocaleString('ru-RU') })));
 }
 
 grid(); switchBoard('snake'); loadStats();

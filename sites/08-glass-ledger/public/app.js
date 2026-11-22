@@ -8,16 +8,16 @@ async function api(url, opts = {}) {
   const res = await fetch(url, { headers: { 'Content-Type': 'application/json' }, ...opts });
   if (res.status === 204) return null;
   const data = await res.json();
-  if (!res.ok) throw new Error(data.error || 'Request failed');
+  if (!res.ok) throw new Error(data.error || 'Ошибка запроса');
   return data;
 }
 function toast(msg) {
   const t = $('#toast'); t.textContent = msg; t.classList.add('show');
   clearTimeout(toast.t); toast.t = setTimeout(() => t.classList.remove('show'), 2600);
 }
-const money = (c, dec = 0) => (c < 0 ? '−' : '') + '$' + (Math.abs(c) / 100).toLocaleString('en-US', { minimumFractionDigits: dec, maximumFractionDigits: dec });
-const monthName = (m) => new Date(m + '-15T00:00:00Z').toLocaleDateString('en-US', { month: 'long', year: 'numeric', timeZone: 'UTC' });
-const shortMonth = (m) => new Date(m + '-15T00:00:00Z').toLocaleDateString('en-US', { month: 'short', timeZone: 'UTC' });
+const money = (c, dec = 0) => (c < 0 ? '−' : '') + (Math.abs(c) / 100).toLocaleString('ru-RU', { minimumFractionDigits: dec, maximumFractionDigits: dec }) + ' ₽';
+const monthName = (m) => { const s = new Date(m + '-15T00:00:00Z').toLocaleDateString('ru-RU', { month: 'long', year: 'numeric', timeZone: 'UTC' }).replace(' г.', ''); return s[0].toUpperCase() + s.slice(1); };
+const shortMonth = (m) => new Date(m + '-15T00:00:00Z').toLocaleDateString('ru-RU', { month: 'short', timeZone: 'UTC' }).replace('.', '');
 
 // Smoothly count numbers up/down
 function countTo(node, cents) {
@@ -50,7 +50,7 @@ function drawTrend(trend) {
   const y = (v) => H - P - (v / max) * (H - P * 2);
   animate((k) => {
     ctx.clearRect(0, 0, W, H);
-    ctx.strokeStyle = 'rgba(255,255,255,.07)'; ctx.fillStyle = '#9aa3c7'; ctx.font = '12px Plus Jakarta Sans';
+    ctx.strokeStyle = 'rgba(255,255,255,.07)'; ctx.fillStyle = '#9aa3c7'; ctx.font = '12px Montserrat';
     for (let i = 0; i <= 4; i++) { const yy = P + (i * (H - P * 2)) / 4; ctx.beginPath(); ctx.moveTo(P, yy); ctx.lineTo(W - P, yy); ctx.stroke(); }
     trend.forEach((t, i) => ctx.fillText(shortMonth(t.month), x(i) - 12, H - 10));
     [['income', '#5eead4'], ['expenses', '#f472b6']].forEach(([key, color]) => {
@@ -90,20 +90,20 @@ async function refresh() {
   const [s, txs] = await Promise.all([api(`/api/summary?month=${month}`), api(`/api/transactions?month=${month}`)]);
   countTo($('#balance'), s.balance); countTo($('#kIncome'), s.income); countTo($('#kExpenses'), s.expenses); countTo($('#kNet'), s.net);
   const pct = s.income ? Math.round((s.net / s.income) * 100) : 0;
-  $('#kNetPct').textContent = `${pct}% saved`; $('#kNetPct').className = pct >= 0 ? 'up' : 'down';
+  $('#kNetPct').textContent = `отложено ${pct}%`; $('#kNetPct').className = pct >= 0 ? 'up' : 'down';
   drawTrend(s.trend); drawDonut(s.byCategory);
 
   $('#budgets').replaceChildren(...s.byCategory.map((b) => {
     const pctB = b.budget ? Math.min(100, (b.spent / b.budget) * 100) : 0;
-    const li = el('li', { className: b.budget && b.spent > b.budget ? 'over' : '', title: 'Click to edit budget' },
+    const li = el('li', { className: b.budget && b.spent > b.budget ? 'over' : '', title: 'Нажмите, чтобы изменить бюджет' },
       el('div', { className: 'row' }, el('span', { textContent: `${b.icon} ${b.name}` }), el('small', { textContent: `${money(b.spent)} / ${b.budget ? money(b.budget) : '—'}` })),
       el('div', { className: 'bar' }, el('i')));
     li.style.setProperty('--c', b.color);
     requestAnimationFrame(() => requestAnimationFrame(() => (li.querySelector('i').style.width = `${b.budget ? pctB : 0}%`)));
     li.onclick = async () => {
-      const v = prompt(`Monthly budget for ${b.name} (USD, empty to clear):`, b.budget ? b.budget / 100 : '');
+      const v = prompt(`Месячный бюджет «${b.name}» в рублях (пусто — убрать лимит):`, b.budget ? b.budget / 100 : '');
       if (v === null) return;
-      try { await api(`/api/categories/${b.id}/budget`, { method: 'PATCH', body: JSON.stringify({ budget: v.trim() }) }); toast('Budget updated'); refresh(); }
+      try { await api(`/api/categories/${b.id}/budget`, { method: 'PATCH', body: JSON.stringify({ budget: v.trim() }) }); toast('Бюджет обновлён'); refresh(); }
       catch (err) { toast(err.message); }
     };
     return li;
@@ -112,12 +112,12 @@ async function refresh() {
   $('#txList').replaceChildren(...(txs.length ? txs.map((t, i) => {
     const li = el('li', {},
       el('span', { className: 'ic', textContent: t.icon }),
-      el('div', {}, el('b', { textContent: t.note || t.category }), el('small', { textContent: `${t.category} · ${new Date(t.date + 'T00:00:00Z').toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' })}` })),
+      el('div', {}, el('b', { textContent: t.note || t.category }), el('small', { textContent: `${t.category} · ${new Date(t.date + 'T00:00:00Z').toLocaleDateString('ru-RU', { month: 'short', day: 'numeric', timeZone: 'UTC' })}` })),
       el('span', { className: `amt ${t.kind === 'income' ? 'in' : ''}`, textContent: `${t.kind === 'income' ? '+' : '−'}${money(t.amount_cents, 2)}` }));
     li.style.setProperty('--c', t.color); li.style.animationDelay = `${Math.min(i, 15) * 30}ms`;
     li.onclick = () => openTx(t);
     return li;
-  }) : [el('li', { className: 'empty', textContent: 'No transactions this month yet.' })]));
+  }) : [el('li', { className: 'empty', textContent: 'В этом месяце операций пока нет.' })]));
 }
 
 // ---------- Transaction dialog ----------
@@ -129,7 +129,7 @@ function fillCategories(kind, selected) {
 form.querySelectorAll('input[name=kind]').forEach((r) => (r.onchange = () => fillCategories(r.value)));
 function openTx(t = null) {
   editing = t; form.reset();
-  $('#txTitle').textContent = t ? 'Edit transaction' : 'New transaction';
+  $('#txTitle').textContent = t ? 'Редактирование операции' : 'Новая операция';
   $('#txDelete').hidden = !t;
   const kind = t?.kind || 'expense';
   form.querySelector(`input[name=kind][value=${kind}]`).checked = true;
@@ -147,9 +147,9 @@ form.addEventListener('submit', async (e) => {
   const body = JSON.stringify({ amount: form.elements.amount.value, category_id: form.elements.category_id.value, date: form.elements.date.value, note: form.elements.note.value });
   try {
     await api(editing ? `/api/transactions/${editing.id}` : '/api/transactions', { method: editing ? 'PUT' : 'POST', body });
-    dlg.close(); toast(editing ? 'Transaction updated' : 'Transaction added ✨'); refresh();
+    dlg.close(); toast(editing ? 'Операция обновлена' : 'Операция добавлена ✨'); refresh();
   } catch (err) { toast(err.message); }
 });
-$('#txDelete').onclick = async () => { await api(`/api/transactions/${editing.id}`, { method: 'DELETE' }); dlg.close(); toast('Transaction deleted'); refresh(); };
+$('#txDelete').onclick = async () => { await api(`/api/transactions/${editing.id}`, { method: 'DELETE' }); dlg.close(); toast('Операция удалена'); refresh(); };
 
 api('/api/categories').then((c) => { categories = c; refresh(); });

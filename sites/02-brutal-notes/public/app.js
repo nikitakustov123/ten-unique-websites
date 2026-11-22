@@ -8,7 +8,7 @@ async function api(url, opts = {}) {
   const res = await fetch(url, { headers: { 'Content-Type': 'application/json' }, ...opts });
   if (res.status === 204) return null;
   const data = await res.json();
-  if (!res.ok) throw new Error(data.error || 'Request failed');
+  if (!res.ok) throw new Error(data.error || 'Ошибка запроса');
   return data;
 }
 function toast(msg) {
@@ -20,10 +20,10 @@ function toast(msg) {
 }
 const ago = (iso) => {
   const s = (Date.now() - new Date(iso.replace(' ', 'T') + 'Z')) / 1000;
-  if (s < 60) return 'JUST NOW';
-  if (s < 3600) return `${Math.floor(s / 60)} MIN AGO`;
-  if (s < 86400) return `${Math.floor(s / 3600)} H AGO`;
-  return `${Math.floor(s / 86400)} DAYS AGO`;
+  if (s < 60) return 'ТОЛЬКО ЧТО';
+  if (s < 3600) return `${Math.floor(s / 60)} МИН НАЗАД`;
+  if (s < 86400) return `${Math.floor(s / 3600)} Ч НАЗАД`;
+  return `${Math.floor(s / 86400)} ДН НАЗАД`;
 };
 
 let state = { q: '', tag: '', editing: null };
@@ -35,13 +35,13 @@ async function refresh() {
   const [notes, tags, stats] = await Promise.all([api(`/api/notes?${params}`), api('/api/tags'), api('/api/stats')]);
 
   $('#stats').replaceChildren(
-    el('span', { textContent: `${stats.total} NOTES` }),
-    el('span', { textContent: `${stats.pinned || 0} PINNED` }),
-    el('span', { textContent: `${stats.tags} TAGS` }),
+    el('span', { textContent: `${stats.total} ЗАМЕТОК` }),
+    el('span', { textContent: `${stats.pinned || 0} ЗАКРЕПЛЕНО` }),
+    el('span', { textContent: `${stats.tags} ТЕГОВ` }),
   );
 
   $('#tagBar').replaceChildren(
-    el('button', { className: `tag ${state.tag ? '' : 'active'}`, textContent: '#ALL', onclick: () => { state.tag = ''; refresh(); } }),
+    el('button', { className: `tag ${state.tag ? '' : 'active'}`, textContent: '#ВСЕ', onclick: () => { state.tag = ''; refresh(); } }),
     ...tags.map((t) => el('button', {
       className: `tag ${state.tag === t.name ? 'active' : ''}`,
       textContent: `#${t.name} (${t.count})`,
@@ -53,7 +53,7 @@ async function refresh() {
   $('#board').replaceChildren(...notes.map((n, i) => {
     const card = el('article', { className: `note ${n.color}`, tabIndex: 0 },
       el('button', {
-        className: `pin ${n.pinned ? 'on' : ''}`, textContent: '📌', title: n.pinned ? 'Unpin' : 'Pin',
+        className: `pin ${n.pinned ? 'on' : ''}`, textContent: '📌', title: n.pinned ? 'Открепить' : 'Закрепить',
         onclick: async (e) => { e.stopPropagation(); await api(`/api/notes/${n.id}/pin`, { method: 'PATCH' }); refresh(); },
       }),
       el('h3', { textContent: n.title }),
@@ -73,7 +73,7 @@ const dlg = $('#editor'), form = $('#noteForm');
 function openEditor(note = null) {
   state.editing = note;
   form.reset();
-  $('#dlgTitle').textContent = note ? 'EDIT NOTE' : 'NEW NOTE';
+  $('#dlgTitle').textContent = note ? 'ПРАВКА' : 'НОВАЯ ЗАМЕТКА';
   $('#deleteBtn').hidden = !note;
   if (note) {
     form.elements.title.value = note.title;
@@ -103,7 +103,7 @@ form.addEventListener('submit', async (e) => {
     if (state.editing) await api(`/api/notes/${state.editing.id}`, { method: 'PUT', body: JSON.stringify(payload) });
     else await api('/api/notes', { method: 'POST', body: JSON.stringify(payload) });
     dlg.close();
-    toast(state.editing ? 'SAVED.' : 'NOTE CREATED. BOOM.');
+    toast(state.editing ? 'СОХРАНЕНО.' : 'ЗАМЕТКА СОЗДАНА. БУМ.');
     refresh();
   } catch (err) { toast(err.message.toUpperCase()); }
 });
@@ -112,7 +112,7 @@ $('#deleteBtn').onclick = async () => {
   if (!state.editing) return;
   await api(`/api/notes/${state.editing.id}`, { method: 'DELETE' });
   dlg.close();
-  toast('DELETED. GONE. FOREVER.');
+  toast('УДАЛЕНО. НАВСЕГДА.');
   refresh();
 };
 
@@ -123,7 +123,7 @@ $('#search').addEventListener('input', (e) => {
 });
 
 document.addEventListener('keydown', (e) => {
-  if (e.key === 'n' && !dlg.open && document.activeElement.tagName !== 'INPUT') { e.preventDefault(); openEditor(); }
+  if ((e.key === 'n' || e.key === 'т') && !dlg.open && document.activeElement.tagName !== 'INPUT') { e.preventDefault(); openEditor(); }
 });
 
 refresh();

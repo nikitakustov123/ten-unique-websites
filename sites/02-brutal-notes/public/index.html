@@ -1,40 +1,38 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>BRUTAL/NOTES — loud notes for loud thinkers</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  <title>BRUTAL/NOTES — громкие заметки для громких мыслей</title>
+  <link rel="stylesheet" href="fonts/fonts.css" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <header class="top">
     <h1 class="logo"><span>BRUTAL</span>/NOTES</h1>
     <div class="stats" id="stats"></div>
-    <button class="btn btn-new" id="newBtn">+ NEW NOTE</button>
+    <button class="btn btn-new" id="newBtn">+ НОВАЯ ЗАМЕТКА</button>
   </header>
 
-  <div class="ticker" aria-hidden="true"><div>NO FLUFF ✱ NO GRADIENTS ✱ JUST NOTES ✱ WRITE IT DOWN ✱ NO FLUFF ✱ NO GRADIENTS ✱ JUST NOTES ✱ WRITE IT DOWN ✱&nbsp;</div></div>
+  <div class="ticker" aria-hidden="true"><div>БЕЗ ВОДЫ ✱ БЕЗ ГРАДИЕНТОВ ✱ ТОЛЬКО ЗАМЕТКИ ✱ ЗАПИШИ ЭТО ✱ БЕЗ ВОДЫ ✱ БЕЗ ГРАДИЕНТОВ ✱ ТОЛЬКО ЗАМЕТКИ ✱ ЗАПИШИ ЭТО ✱&nbsp;</div></div>
 
   <section class="toolbar">
-    <input id="search" type="search" placeholder="SEARCH EVERYTHING…" autocomplete="off" />
+    <input id="search" type="search" placeholder="ИСКАТЬ ВСЁ…" autocomplete="off" />
     <div class="tags" id="tagBar"></div>
   </section>
 
   <main class="board" id="board"></main>
-  <p class="empty" id="empty" hidden>NOTHING HERE. WRITE SOMETHING.</p>
+  <p class="empty" id="empty" hidden>ТУТ ПУСТО. НАПИШИ ЧТО-НИБУДЬ.</p>
 
   <dialog id="editor">
     <form method="dialog" id="noteForm">
       <div class="dlg-head">
-        <h2 id="dlgTitle">NEW NOTE</h2>
-        <button type="button" class="x" id="closeDlg" aria-label="Close">✕</button>
+        <h2 id="dlgTitle">НОВАЯ ЗАМЕТКА</h2>
+        <button type="button" class="x" id="closeDlg" aria-label="Закрыть">✕</button>
       </div>
-      <input name="title" placeholder="TITLE" maxlength="120" required />
-      <textarea name="body" placeholder="Dump your brain here…" maxlength="4000"></textarea>
-      <input name="tags" placeholder="tags, comma, separated" maxlength="200" />
+      <input name="title" placeholder="ЗАГОЛОВОК" maxlength="120" required />
+      <textarea name="body" placeholder="Вывали сюда всё из головы…" maxlength="4000"></textarea>
+      <input name="tags" placeholder="теги, через, запятую" maxlength="200" />
       <div class="colors" id="colors">
         <label><input type="radio" name="color" value="yellow" checked /><span class="sw yellow"></span></label>
         <label><input type="radio" name="color" value="pink" /><span class="sw pink"></span></label>
@@ -43,16 +41,16 @@
         <label><input type="radio" name="color" value="orange" /><span class="sw orange"></span></label>
         <label><input type="radio" name="color" value="white" /><span class="sw white"></span></label>
       </div>
-      <label class="pin-check"><input type="checkbox" name="pinned" /> PIN TO TOP</label>
+      <label class="pin-check"><input type="checkbox" name="pinned" /> ЗАКРЕПИТЬ НАВЕРХУ</label>
       <div class="dlg-actions">
-        <button type="button" class="btn btn-danger" id="deleteBtn" hidden>DELETE</button>
-        <button type="submit" class="btn">SAVE IT</button>
+        <button type="button" class="btn btn-danger" id="deleteBtn" hidden>УДАЛИТЬ</button>
+        <button type="submit" class="btn">СОХРАНИТЬ</button>
       </div>
     </form>
   </dialog>
 
   <div class="toast" id="toast"></div>
-  <footer class="foot">BUILT WITH CONCRETE &amp; SQLITE ✱ 2026</footer>
+  <footer class="foot">СОБРАНО ИЗ БЕТОНА И SQLITE ✱ 2026</footer>
   <script src="app.js"></script>
 </body>
 </html>

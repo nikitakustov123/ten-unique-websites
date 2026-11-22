@@ -7,7 +7,7 @@ const el = (tag, props = {}, ...kids) => {
 async function api(url, opts = {}) {
   const res = await fetch(url, { headers: { 'Content-Type': 'application/json' }, ...opts });
   const data = await res.json();
-  if (!res.ok) throw new Error(data.error || 'Request failed');
+  if (!res.ok) throw new Error(data.error || 'Ошибка запроса');
   return data;
 }
 function toast(msg) {
@@ -33,15 +33,15 @@ async function loadBoard() {
   if (state.tag) params.set('tag', state.tag);
   const recipes = await api(`/api/recipes?${params}`);
   const board = $('#board');
-  if (!recipes.length) return board.replaceChildren(el('p', { className: 'empty', textContent: 'nothing in the pantry for that… try another word!' }));
+  if (!recipes.length) return board.replaceChildren(el('p', { className: 'empty', textContent: 'в кладовке такого нет… попробуйте другое слово!' }));
   board.replaceChildren(...recipes.map((r, i) => {
     const card = el('article', { className: 'card', tabIndex: 0 },
       el('div', { className: 'em', textContent: r.emoji }),
       el('h3', { textContent: r.title }),
       el('p', { textContent: r.summary }),
       el('div', { className: 'meta' },
-        el('span', { className: 'stars', textContent: starStr(r.rating), title: `${r.rating ?? 'no'} rating · ${r.rating_count} votes` }),
-        el('span', { textContent: `⏱ ${r.minutes}m · 💬 ${r.comment_count}` })));
+        el('span', { className: 'stars', textContent: starStr(r.rating), title: `рейтинг ${r.rating ?? '—'} · голосов: ${r.rating_count}` }),
+        el('span', { textContent: `⏱ ${r.minutes} мин · 💬 ${r.comment_count}` })));
     card.style.setProperty('--r', `${((i * 37) % 7) - 3}deg`);
     card.style.setProperty('--tr', `${((i * 53) % 9) - 4}deg`);
     card.style.setProperty('--tape', TAPES[i % TAPES.length]);
@@ -54,9 +54,9 @@ async function loadBoard() {
 
 async function loadTags() {
   const tags = await api('/api/tags');
-  const render = () => $('#tags').replaceChildren(...['all', ...tags].map((t) => {
-    const b = el('button', { className: `tag ${(state.tag || 'all') === t ? 'on' : ''}`, textContent: t });
-    b.onclick = () => { state.tag = t === 'all' ? '' : t; render(); loadBoard(); };
+  const render = () => $('#tags').replaceChildren(...['все', ...tags].map((t) => {
+    const b = el('button', { className: `tag ${(state.tag || 'все') === t ? 'on' : ''}`, textContent: t });
+    b.onclick = () => { state.tag = t === 'все' ? '' : t; render(); loadBoard(); };
     return b;
   }));
   render();
@@ -88,12 +88,12 @@ async function openRecipe(id) {
 
   const rate = el('span', { className: 'rate' });
   [1, 2, 3, 4, 5].forEach((n) => {
-    const b = el('button', { textContent: '★', title: `${n} star${n > 1 ? 's' : ''}` });
+    const b = el('button', { textContent: '★', title: `${n} из 5` });
     b.onmouseenter = () => rate.querySelectorAll('button').forEach((x, i) => x.classList.toggle('hov', i < n));
     b.onclick = async () => {
       const res = await api(`/api/recipes/${id}/rate`, { method: 'POST', body: JSON.stringify({ stars: n }) });
       ratingLine.textContent = `${starStr(res.rating)} ${res.rating} (${res.rating_count})`;
-      toast(`thanks for the ${n}★!`); loadBoard();
+      toast(`спасибо за ${n}★!`); loadBoard();
     };
     rate.append(b);
   });
@@ -105,13 +105,13 @@ async function openRecipe(id) {
     const n = el('div', { className: 'comment' }, el('b', { textContent: `${c.author}: ` }), c.body);
     n.style.setProperty('--r', `${(i % 2 ? 0.6 : -0.6)}deg`);
     return n;
-  }) : [el('p', { className: 'by', textContent: 'no notes yet — be the first!' })]));
+  }) : [el('p', { className: 'by', textContent: 'заметок пока нет — будьте первым!' })]));
   renderComments(r.comments);
 
   const cForm = el('form', { className: 'comment-form' },
-    el('input', { name: 'author', placeholder: 'your name', maxLength: 50 }),
-    el('input', { name: 'body', placeholder: 'leave a note on this recipe…', maxLength: 600, required: true }),
-    el('button', { className: 'sticker', type: 'submit', textContent: 'stick it' }));
+    el('input', { name: 'author', placeholder: 'ваше имя', maxLength: 50 }),
+    el('input', { name: 'body', placeholder: 'оставьте заметку к рецепту…', maxLength: 600, required: true }),
+    el('button', { className: 'sticker', type: 'submit', textContent: 'приклеить' }));
   cForm.onsubmit = async (e) => {
     e.preventDefault();
     try {
@@ -124,20 +124,20 @@ async function openRecipe(id) {
   const plus = el('button', { textContent: '+', type: 'button', onclick: () => { if (servings < 48) { servings++; renderIng(); } } });
 
   $('#page').replaceChildren(
-    el('button', { className: 'close', textContent: '✕', onclick: closeBook, ariaLabel: 'Close' }),
+    el('button', { className: 'close', textContent: '✕', onclick: closeBook, ariaLabel: 'Закрыть' }),
     el('header', {},
       el('h2', { textContent: `${r.emoji} ${r.title}` }),
-      el('p', { className: 'by', textContent: `from the kitchen of ${r.author}` }),
+      el('p', { className: 'by', textContent: `с кухни: ${r.author}` }),
       el('div', { className: 'facts' },
-        el('span', { textContent: `⏱ ${r.minutes} minutes` }),
-        el('span', { className: 'scaler' }, '🍽 serves ', minus, servingsLabel, plus),
+        el('span', { textContent: `⏱ ${r.minutes} минут` }),
+        el('span', { className: 'scaler' }, '🍽 порций: ', minus, servingsLabel, plus),
         ratingLine)),
     el('div', { className: 'cols' },
-      el('section', {}, el('h3', { textContent: 'you will need' }), ingList),
-      el('section', {}, el('h3', { textContent: 'method' }), el('ol', { className: 'steps' }, r.steps.map((s) => el('li', { textContent: s }))))),
+      el('section', {}, el('h3', { textContent: 'понадобится' }), ingList),
+      el('section', {}, el('h3', { textContent: 'приготовление' }), el('ol', { className: 'steps' }, r.steps.map((s) => el('li', { textContent: s }))))),
     el('section', { className: 'comments' },
-      el('h3', { textContent: 'rate it' }), rate,
-      el('h3', { textContent: 'kitchen notes' }), commentsBox, cForm));
+      el('h3', { textContent: 'оцените' }), rate,
+      el('h3', { textContent: 'кухонные заметки' }), commentsBox, cForm));
   book.hidden = false; document.body.style.overflow = 'hidden';
   $('#page').scrollTop = 0;
   // retrigger flip animation
@@ -148,15 +148,15 @@ async function openRecipe(id) {
 const dlg = $('#newDlg'), nf = $('#newForm');
 const ingRow = () => {
   const row = el('div', { className: 'ing-row' },
-    el('input', { placeholder: 'qty', type: 'number', step: 'any', min: 0, className: 'i-qty' }),
-    el('input', { placeholder: 'unit', maxLength: 12, className: 'i-unit' }),
-    el('input', { placeholder: 'ingredient', maxLength: 80, className: 'i-item' }),
+    el('input', { placeholder: 'кол-во', type: 'number', step: 'any', min: 0, className: 'i-qty' }),
+    el('input', { placeholder: 'ед.', maxLength: 12, className: 'i-unit' }),
+    el('input', { placeholder: 'ингредиент', maxLength: 80, className: 'i-item' }),
     el('button', { type: 'button', className: 'rm', textContent: '×', onclick: () => row.remove() }));
   $('#ingRows').append(row);
 };
 const stepRow = () => {
   const row = el('div', { className: 'step-row' },
-    el('input', { placeholder: `step ${$('#stepRows').children.length + 1}`, maxLength: 500, className: 's-body' }),
+    el('input', { placeholder: `шаг ${$('#stepRows').children.length + 1}`, maxLength: 500, className: 's-body' }),
     el('button', { type: 'button', className: 'rm', textContent: '×', onclick: () => row.remove() }));
   $('#stepRows').append(row);
 };
@@ -174,7 +174,7 @@ nf.addEventListener('submit', async (e) => {
   f.steps = [...nf.querySelectorAll('.s-body')].map((i) => i.value);
   try {
     const { id } = await api('/api/recipes', { method: 'POST', body: JSON.stringify(f) });
-    dlg.close(); toast('pinned to the board! 📌');
+    dlg.close(); toast('рецепт на доске! 📌');
     state.tag = ''; await loadTags(); await loadBoard(); openRecipe(id);
   } catch (err) { toast(err.message); }
 });

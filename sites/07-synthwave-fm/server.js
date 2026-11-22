@@ -1,4 +1,4 @@
-// Synthwave FM — retro internet radio: show schedule, live "now on air", song requests with upvotes.
+// Synthwave FM — ретро-интернет-радио: расписание, «сейчас в эфире», заявки песен с голосованием.
 import express from 'express';
 import { DatabaseSync } from 'node:sqlite';
 import { mkdirSync } from 'node:fs';
@@ -42,19 +42,19 @@ db.exec(`
 if (db.prepare('SELECT COUNT(*) AS n FROM shows').get().n === 0) {
   const s = db.prepare('INSERT INTO shows (title, host, start_hour, end_hour, vibe, color) VALUES (?,?,?,?,?,?)');
   [
-    ['Midnight Drive', 'DJ Vektor', 0, 4, 'Darksynth · outrun · empty highways', '#ff2a6d'],
-    ['Neon Dawn', 'Luna Laser', 4, 8, 'Dreamwave · chillsynth · first coffee', '#05d9e8'],
-    ['Chrome Commute', 'Max Overdrive', 8, 12, 'Upbeat retrowave for the rush hour', '#f9c80e'],
-    ['Arcade Lunch', 'Pixel Pete', 12, 16, 'Chiptune · game soundtracks · bleeps', '#7b2cbf'],
-    ['Sunset Boulevard', 'Vera Velvet', 16, 20, 'Synthpop · italo disco · golden hour', '#ff7b00'],
-    ['Laser Grid', 'The Analog Twins', 20, 24, 'Cyberpunk · heavy synths · live sets', '#d1f7ff'],
+    ['Полуночный драйв', 'DJ Вектор', 0, 4, 'Дарксинт · аутран · пустые трассы', '#ff2a6d'],
+    ['Неоновый рассвет', 'Луна Лазер', 4, 8, 'Дримвейв · чиллсинт · первый кофе', '#05d9e8'],
+    ['Хромовая дорога', 'Макс Овердрайв', 8, 12, 'Бодрый ретровейв для часа пик', '#f9c80e'],
+    ['Аркадный обед', 'Пиксель Петя', 12, 16, 'Чиптюн · саундтреки игр · бипы', '#7b2cbf'],
+    ['Бульвар заката', 'Вера Вельвет', 16, 20, 'Синтипоп · итало-диско · золотой час', '#ff7b00'],
+    ['Лазерная сетка', 'Аналоговые близнецы', 20, 24, 'Киберпанк · тяжёлые синты · живые сеты', '#d1f7ff'],
   ].forEach((r) => s.run(...r));
   const r = db.prepare('INSERT INTO requests (artist, title, requested_by, dedication, votes) VALUES (?,?,?,?,?)');
-  r.run('The Midnight', 'Sunset', 'neonkid', 'For everyone driving home tonight', 14);
+  r.run('The Midnight', 'Sunset', 'neonkid', 'Всем, кто сегодня ночью едет домой', 14);
   r.run('FM-84', 'Running in the Night', 'outrun_olly', null, 11);
-  r.run('Timecop1983', 'On the Run', 'vhs_vera', 'To my VHS collection', 8);
+  r.run('Timecop1983', 'On the Run', 'vhs_vera', 'Моей коллекции VHS-кассет', 8);
   r.run('Gunship', 'Tech Noir', 'cyberkat', null, 6);
-  r.run('Kavinsky', 'Nightcall', 'drive_fan', 'Real human being', 5);
+  r.run('Kavinsky', 'Nightcall', 'drive_fan', 'Настоящему герою', 5);
 }
 
 const text = (v, max) => (typeof v === 'string' ? v.trim().slice(0, max) : '');
@@ -89,10 +89,10 @@ app.get('/api/requests', (req, res) => {
 
 app.post('/api/requests', (req, res) => {
   const artist = text(req.body.artist, 80), title = text(req.body.title, 100);
-  const by = text(req.body.requested_by, 30) || 'anonymous', dedication = text(req.body.dedication, 140) || null;
-  if (!artist || !title) return fail(res, 'Artist and track title are required.');
+  const by = text(req.body.requested_by, 30) || 'аноним', dedication = text(req.body.dedication, 140) || null;
+  if (!artist || !title) return fail(res, 'Укажите исполнителя и название трека.');
   const dup = db.prepare('SELECT id FROM requests WHERE played = 0 AND artist = ? COLLATE NOCASE AND title = ? COLLATE NOCASE').get(artist, title);
-  if (dup) return fail(res, 'That track is already in the queue — upvote it instead!', 409);
+  if (dup) return fail(res, 'Этот трек уже в очереди — лучше проголосуйте за него!', 409);
   const id = Number(db.prepare('INSERT INTO requests (artist, title, requested_by, dedication, votes) VALUES (?,?,?,?,1)').run(artist, title, by, dedication).lastInsertRowid);
   const v = visitorId(req);
   if (v) db.prepare('INSERT OR IGNORE INTO request_votes (request_id, visitor) VALUES (?, ?)').run(id, v);
@@ -101,9 +101,9 @@ app.post('/api/requests', (req, res) => {
 
 app.post('/api/requests/:id/vote', (req, res) => {
   const v = visitorId(req);
-  if (!v) return fail(res, 'Missing visitor id.');
+  if (!v) return fail(res, 'Не передан идентификатор слушателя.');
   const id = Number(req.params.id);
-  if (!db.prepare('SELECT 1 FROM requests WHERE id = ?').get(id)) return fail(res, 'Request not found', 404);
+  if (!db.prepare('SELECT 1 FROM requests WHERE id = ?').get(id)) return fail(res, 'Заявка не найдена', 404);
   db.exec('BEGIN');
   try {
     const had = db.prepare('SELECT 1 FROM request_votes WHERE request_id = ? AND visitor = ?').get(id, v);
@@ -122,11 +122,11 @@ app.post('/api/requests/:id/vote', (req, res) => {
 // "DJ booth": marks the top request as played, as a DJ would after spinning it.
 app.post('/api/requests/next', (req, res) => {
   const top = db.prepare('SELECT id FROM requests WHERE played = 0 ORDER BY votes DESC, id LIMIT 1').get();
-  if (!top) return fail(res, 'Queue is empty', 404);
+  if (!top) return fail(res, 'Очередь пуста', 404);
   db.prepare('UPDATE requests SET played = 1 WHERE id = ?').run(top.id);
   res.json({ played: top.id });
 });
 
-app.use('/api', (req, res) => fail(res, 'Not found', 404));
-app.use((err, req, res, _next) => { console.error(err); fail(res, 'Signal lost. Try again.', 500); });
+app.use('/api', (req, res) => fail(res, 'Не найдено', 404));
+app.use((err, req, res, _next) => { console.error(err); fail(res, 'Сигнал потерян. Попробуйте ещё раз.', 500); });
 app.listen(PORT, () => console.log(`Synthwave FM → http://localhost:${PORT}`));

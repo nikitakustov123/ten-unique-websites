@@ -1,12 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Glass Ledger — Money, made clear</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;500;700;800&display=swap" rel="stylesheet" />
+  <title>Glass Ledger — деньги под контролем</title>
+  <link rel="stylesheet" href="fonts/fonts.css" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -16,45 +14,45 @@
     <aside class="side glass">
       <div class="brand"><span class="gem"></span>Glass Ledger</div>
       <div class="balance">
-        <small>Total balance</small>
-        <strong id="balance" data-count="0">$0</strong>
+        <small>Общий баланс</small>
+        <strong id="balance" data-count="0">0 ₽</strong>
       </div>
       <div class="month-nav">
-        <button id="prevMonth" aria-label="Previous month">‹</button>
+        <button id="prevMonth" aria-label="Предыдущий месяц">‹</button>
         <span id="monthLabel"></span>
-        <button id="nextMonth" aria-label="Next month">›</button>
+        <button id="nextMonth" aria-label="Следующий месяц">›</button>
       </div>
-      <a class="export" href="/api/export.csv">⬇ Export CSV</a>
-      <p class="tip">Tip: click a budget bar to edit the monthly limit.</p>
+      <a class="export" href="/api/export.csv">⬇ Экспорт в CSV</a>
+      <p class="tip">Совет: нажмите на полосу бюджета, чтобы изменить месячный лимит.</p>
     </aside>
 
     <main class="main">
       <section class="kpis">
-        <div class="kpi glass"><small>Income</small><strong id="kIncome">$0</strong><span class="up">▲</span></div>
-        <div class="kpi glass"><small>Expenses</small><strong id="kExpenses">$0</strong><span class="down">▼</span></div>
-        <div class="kpi glass"><small>Net this month</small><strong id="kNet">$0</strong><span id="kNetPct"></span></div>
+        <div class="kpi glass"><small>Доходы</small><strong id="kIncome">0 ₽</strong><span class="up">▲</span></div>
+        <div class="kpi glass"><small>Расходы</small><strong id="kExpenses">0 ₽</strong><span class="down">▼</span></div>
+        <div class="kpi glass"><small>Итог месяца</small><strong id="kNet">0 ₽</strong><span id="kNetPct"></span></div>
       </section>
 
       <section class="charts">
         <div class="glass card">
-          <h3>Six-month flow</h3>
+          <h3>Денежный поток за полгода</h3>
           <canvas id="trend" width="640" height="260"></canvas>
-          <div class="legend"><span class="li-in">Income</span><span class="li-out">Expenses</span></div>
+          <div class="legend"><span class="li-in">Доходы</span><span class="li-out">Расходы</span></div>
         </div>
         <div class="glass card donut-card">
-          <h3>Spending mix</h3>
+          <h3>Структура трат</h3>
           <canvas id="donut" width="260" height="260"></canvas>
-          <div class="donut-center"><small>spent</small><strong id="donutTotal">$0</strong></div>
+          <div class="donut-center"><small>потрачено</small><strong id="donutTotal">0 ₽</strong></div>
         </div>
       </section>
 
       <section class="split">
         <div class="glass card">
-          <h3>Budgets</h3>
+          <h3>Бюджеты</h3>
           <ul class="budgets" id="budgets"></ul>
         </div>
         <div class="glass card">
-          <div class="card-head"><h3>Transactions</h3><button class="add" id="addBtn">+ Add</button></div>
+          <div class="card-head"><h3>Операции</h3><button class="add" id="addBtn">+ Добавить</button></div>
           <ul class="tx" id="txList"></ul>
         </div>
       </section>
@@ -63,16 +61,16 @@
 
   <dialog id="txDlg" class="glass">
     <form id="txForm">
-      <h3 id="txTitle">New transaction</h3>
-      <div class="kind-toggle"><label><input type="radio" name="kind" value="expense" checked /><span>Expense</span></label><label><input type="radio" name="kind" value="income" /><span>Income</span></label></div>
-      <label>Amount<input name="amount" type="number" min="0.01" step="0.01" required /></label>
-      <label>Category<select name="category_id" required></select></label>
-      <label>Date<input name="date" type="date" required /></label>
-      <label>Note<input name="note" maxlength="140" placeholder="What was it for?" /></label>
+      <h3 id="txTitle">Новая операция</h3>
+      <div class="kind-toggle"><label><input type="radio" name="kind" value="expense" checked /><span>Расход</span></label><label><input type="radio" name="kind" value="income" /><span>Доход</span></label></div>
+      <label>Сумма, ₽<input name="amount" type="number" min="0.01" step="0.01" required /></label>
+      <label>Категория<select name="category_id" required></select></label>
+      <label>Дата<input name="date" type="date" required /></label>
+      <label>Комментарий<input name="note" maxlength="140" placeholder="На что потратили?" /></label>
       <div class="dlg-actions">
-        <button type="button" class="ghost danger" id="txDelete" hidden>Delete</button>
-        <button type="button" class="ghost" id="txCancel">Cancel</button>
-        <button type="submit" class="add">Save</button>
+        <button type="button" class="ghost danger" id="txDelete" hidden>Удалить</button>
+        <button type="button" class="ghost" id="txCancel">Отмена</button>
+        <button type="submit" class="add">Сохранить</button>
       </div>
     </form>
   </dialog>

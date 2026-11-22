@@ -1,4 +1,4 @@
-// Ember & Oak Roastery — coffee shop with menu, online orders and reviews.
+// Ember & Oak — кофейня-обжарщик: меню, онлайн-заказы навынос и отзывы.
 import express from 'express';
 import { DatabaseSync } from 'node:sqlite';
 import { mkdirSync } from 'node:fs';
@@ -52,24 +52,24 @@ if (db.prepare('SELECT COUNT(*) AS n FROM products').get().n === 0) {
     'INSERT INTO products (name, category, origin, notes, price_cents, roast) VALUES (?, ?, ?, ?, ?, ?)',
   );
   [
-    ['Ember Espresso', 'espresso', 'Brazil · Colombia', 'Dark chocolate, molasses, toasted hazelnut', 350, 4],
-    ['Velvet Flat White', 'espresso', 'House blend', 'Silky milk, caramel, cocoa nib', 450, 4],
-    ['Cortado Noir', 'espresso', 'Guatemala', 'Brown sugar, plum, cedar', 420, 3],
-    ['Smoked Maple Latte', 'espresso', 'House blend', 'Maple syrup, oak smoke, cream', 520, 4],
-    ['Ethiopia Guji V60', 'filter', 'Guji, Ethiopia', 'Jasmine, bergamot, peach', 550, 2],
-    ['Kenya AA Chemex', 'filter', 'Nyeri, Kenya', 'Blackcurrant, grapefruit, tomato leaf', 600, 2],
-    ['Cold Brew 18h', 'filter', 'Peru', 'Cocoa, red apple, long sweet finish', 480, 3],
-    ['Oak Barrel Beans 250g', 'beans', 'Colombia', 'Barrel-aged, whisky, vanilla, fig', 1800, 3],
-    ['Midnight Roast 1kg', 'beans', 'Sumatra', 'Earthy, cedar, dark cherry', 3400, 5],
-    ['Morning Light 250g', 'beans', 'Rwanda', 'Honey, lemon zest, black tea', 1600, 1],
-    ['Cardamom Bun', 'bakery', 'Baked daily', 'Swedish-style, pearl sugar', 380, 1],
-    ['Brown Butter Croissant', 'bakery', 'Baked daily', '72-hour laminated dough', 400, 1],
+    ['Эспрессо «Уголёк»', 'espresso', 'Бразилия · Колумбия', 'Тёмный шоколад, патока, жареный фундук', 18000, 4],
+    ['Бархатный флэт уайт', 'espresso', 'Фирменный бленд', 'Шелковистое молоко, карамель, какао-крупка', 29000, 4],
+    ['Кортадо «Нуар»', 'espresso', 'Гватемала', 'Тростниковый сахар, слива, кедр', 26000, 3],
+    ['Латте с копчёным кленом', 'espresso', 'Фирменный бленд', 'Кленовый сироп, дубовый дымок, сливки', 34000, 4],
+    ['Эфиопия Гуджи, V60', 'filter', 'Гуджи, Эфиопия', 'Жасмин, бергамот, персик', 36000, 2],
+    ['Кения AA, кемекс', 'filter', 'Ньери, Кения', 'Чёрная смородина, грейпфрут, томатный лист', 39000, 2],
+    ['Колд брю 18 часов', 'filter', 'Перу', 'Какао, красное яблоко, долгое сладкое послевкусие', 31000, 3],
+    ['Зерно «Дубовая бочка», 250 г', 'beans', 'Колумбия', 'Выдержка в бочке: виски, ваниль, инжир', 120000, 3],
+    ['Зерно «Полночь», 1 кг', 'beans', 'Суматра', 'Землистый, кедр, тёмная вишня', 290000, 5],
+    ['Зерно «Утренний свет», 250 г', 'beans', 'Руанда', 'Мёд, цедра лимона, чёрный чай', 99000, 1],
+    ['Булочка с кардамоном', 'bakery', 'Печём каждое утро', 'По-шведски, с жемчужным сахаром', 22000, 1],
+    ['Круассан на топлёном масле', 'bakery', 'Печём каждое утро', 'Слоёное тесто 72 часа', 24000, 1],
   ].forEach((p) => ins.run(...p));
 
   const rev = db.prepare('INSERT INTO reviews (author, rating, body) VALUES (?, ?, ?)');
-  rev.run('Marta K.', 5, 'The Guji V60 tastes like a jasmine garden. Best filter coffee in town.');
-  rev.run('Daniel R.', 5, 'Smoked Maple Latte should be illegal. I come back every morning.');
-  rev.run('Ines P.', 4, 'Cosy space, great beans to take home. Cardamom buns sell out fast!');
+  rev.run('Марта К.', 5, 'Гуджи на V60 на вкус как жасминовый сад. Лучший фильтр-кофе в городе.');
+  rev.run('Даниил Р.', 5, 'Латте с копчёным кленом нужно запретить законом. Прихожу каждое утро.');
+  rev.run('Инесса П.', 4, 'Уютно, отличное зерно домой. Булочки с кардамоном разбирают моментально!');
 }
 
 // ---------- Helpers ----------
@@ -96,17 +96,17 @@ app.post('/api/orders', (req, res) => {
   const email = text(req.body.email, 120);
   const pickup = text(req.body.pickup_time, 5);
   const items = Array.isArray(req.body.items) ? req.body.items.slice(0, 30) : [];
-  if (!customer) return fail(res, 'Please tell us your name.');
-  if (!isEmail(email)) return fail(res, 'Please enter a valid email.');
-  if (!/^\d{2}:\d{2}$/.test(pickup)) return fail(res, 'Choose a pickup time.');
-  if (!items.length) return fail(res, 'Your cart is empty.');
+  if (!customer) return fail(res, 'Пожалуйста, укажите имя.');
+  if (!isEmail(email)) return fail(res, 'Укажите корректный email.');
+  if (!/^\d{2}:\d{2}$/.test(pickup)) return fail(res, 'Выберите время, когда заберёте заказ.');
+  if (!items.length) return fail(res, 'Корзина пуста.');
 
   const getProduct = db.prepare('SELECT id, price_cents FROM products WHERE id = ?');
   const lines = [];
   for (const it of items) {
     const p = getProduct.get(Number(it.id));
     const qty = Math.trunc(Number(it.qty));
-    if (!p || !(qty >= 1 && qty <= 20)) return fail(res, 'Invalid item in cart.');
+    if (!p || !(qty >= 1 && qty <= 20)) return fail(res, 'В корзине есть некорректная позиция.');
     lines.push({ ...p, qty });
   }
   const total = lines.reduce((s, l) => s + l.price_cents * l.qty, 0);
@@ -129,7 +129,7 @@ app.post('/api/orders', (req, res) => {
 
 app.get('/api/orders/:id', (req, res) => {
   const order = db.prepare('SELECT id, customer, pickup_time, total_cents, status, created_at FROM orders WHERE id = ?').get(Number(req.params.id));
-  if (!order) return fail(res, 'Order not found', 404);
+  if (!order) return fail(res, 'Заказ не найден', 404);
   order.items = db
     .prepare('SELECT p.name, oi.qty, oi.price_cents FROM order_items oi JOIN products p ON p.id = oi.product_id WHERE oi.order_id = ?')
     .all(order.id);
@@ -146,16 +146,16 @@ app.post('/api/reviews', (req, res) => {
   const author = text(req.body.author, 60);
   const body = text(req.body.body, 500);
   const rating = Math.trunc(Number(req.body.rating));
-  if (!author || body.length < 5) return fail(res, 'Name and a short review are required.');
-  if (!(rating >= 1 && rating <= 5)) return fail(res, 'Rating must be 1–5.');
+  if (!author || body.length < 5) return fail(res, 'Нужны имя и хотя бы пара слов отзыва.');
+  if (!(rating >= 1 && rating <= 5)) return fail(res, 'Оценка должна быть от 1 до 5.');
   const { lastInsertRowid } = db.prepare('INSERT INTO reviews (author, rating, body) VALUES (?, ?, ?)').run(author, rating, body);
   res.status(201).json(db.prepare('SELECT * FROM reviews WHERE id = ?').get(Number(lastInsertRowid)));
 });
 
-app.use('/api', (req, res) => fail(res, 'Not found', 404));
+app.use('/api', (req, res) => fail(res, 'Не найдено', 404));
 app.use((err, req, res, _next) => {
   console.error(err);
-  fail(res, 'Something went wrong on our side.', 500);
+  fail(res, 'Что-то пошло не так на нашей стороне.', 500);
 });
 
 app.listen(PORT, () => console.log(`Ember & Oak Roastery → http://localhost:${PORT}`));

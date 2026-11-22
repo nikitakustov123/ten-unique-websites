@@ -1,4 +1,4 @@
-// BRUTAL/NOTES — neo-brutalist note board with tags, pinning, search and full CRUD.
+// BRUTAL/NOTES — доска заметок в стиле необрутализма: теги, закрепление, поиск и полный CRUD.
 import express from 'express';
 import { DatabaseSync } from 'node:sqlite';
 import { mkdirSync } from 'node:fs';
@@ -11,6 +11,11 @@ const COLORS = ['yellow', 'pink', 'blue', 'green', 'orange', 'white'];
 
 mkdirSync(path.join(__dirname, 'data'), { recursive: true });
 const db = new DatabaseSync(path.join(__dirname, 'data', 'notes.db'));
+
+// SQLite's built-in LIKE is case-insensitive only for ASCII. Override it so that
+// search also ignores case for Cyrillic ("суп" finds "Суп").
+const likeRe = (p) => new RegExp('^' + p.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/%/g, '[\\s\\S]*').replace(/_/g, '[\\s\\S]') + '$', 'iu');
+db.function('like', { deterministic: true }, (p, v) => (p == null || v == null ? null : likeRe(String(p)).test(String(v)) ? 1 : 0));
 db.exec(`
   PRAGMA journal_mode = WAL;
   PRAGMA foreign_keys = ON;
@@ -43,7 +48,7 @@ function setTags(noteId, tags) {
   const find = db.prepare('SELECT id FROM tags WHERE name = ?');
   const link = db.prepare('INSERT OR IGNORE INTO note_tags (note_id, tag_id) VALUES (?, ?)');
   for (const raw of tags) {
-    const name = text(raw, 24).toLowerCase().replace(/[^a-z0-9\-]/g, '');
+    const name = text(raw, 24).toLowerCase().replace(/[^a-zа-яё0-9\-]/g, '');
     if (!name) continue;
     upsert.run(name);
     link.run(noteId, find.get(name).id);
@@ -70,12 +75,12 @@ function parseNote(body) {
 if (db.prepare('SELECT COUNT(*) AS n FROM notes').get().n === 0) {
   const ins = db.prepare('INSERT INTO notes (title, body, color, pinned) VALUES (?, ?, ?, ?)');
   [
-    ['READ ME FIRST', 'This board is LOUD on purpose. Click a note to edit it. Pin the important stuff.', 'yellow', 1, ['welcome']],
-    ['Ship the landing page', 'Hero copy → done\nPricing table → todo\nFooter links → todo', 'pink', 1, ['work', 'urgent']],
-    ['Groceries', 'eggs, oat milk, chili crisp, lemons, MORE coffee', 'green', 0, ['life']],
-    ['Idea: brutalist calendar', 'Every day is a giant black box. Events are stickers. No mercy.', 'blue', 0, ['ideas']],
-    ['Books to read', '1. The Design of Everyday Things\n2. Shape Up\n3. Thinking in Systems', 'orange', 0, ['life', 'ideas']],
-    ['Reminder', 'Drink water. Stretch. Close 37 tabs.', 'white', 0, ['life']],
+    ['ПРОЧТИ МЕНЯ', 'Эта доска ГРОМКАЯ специально. Кликни по заметке, чтобы её отредактировать. Важное — закрепляй.', 'yellow', 1, ['привет']],
+    ['Запустить лендинг', 'Текст первого экрана → готово\nТаблица тарифов → в работе\nСсылки в футере → в работе', 'pink', 1, ['работа', 'срочно']],
+    ['Продукты', 'яйца, овсяное молоко, чили-масло, лимоны, БОЛЬШЕ кофе', 'green', 0, ['жизнь']],
+    ['Идея: брутальный календарь', 'Каждый день — огромная чёрная коробка. События — стикеры. Без пощады.', 'blue', 0, ['идеи']],
+    ['Что почитать', '1. Дизайн привычных вещей\n2. Пиши, сокращай\n3. Азбука системного мышления', 'orange', 0, ['жизнь', 'идеи']],
+    ['Напоминание', 'Пить воду. Размяться. Закрыть 37 вкладок.', 'white', 0, ['жизнь']],
   ].forEach(([t, b, c, p, tags]) => setTags(Number(ins.run(t, b, c, p).lastInsertRowid), tags));
 }
 
@@ -105,7 +110,7 @@ app.get('/api/stats', (req, res) => {
 
 app.post('/api/notes', (req, res) => {
   const n = parseNote(req.body);
-  if (!n.title) return fail(res, 'A note needs a TITLE.');
+  if (!n.title) return fail(res, 'У заметки должен быть ЗАГОЛОВОК.');
   const id = Number(db.prepare('INSERT INTO notes (title, body, color, pinned) VALUES (?, ?, ?, ?)').run(n.title, n.content, n.color, n.pinned).lastInsertRowid);
   setTags(id, n.tags);
   res.status(201).json(getNote(id));
@@ -113,9 +118,9 @@ app.post('/api/notes', (req, res) => {
 
 app.put('/api/notes/:id', (req, res) => {
   const id = Number(req.params.id);
-  if (!getNote(id)) return fail(res, 'Note not found', 404);
+  if (!getNote(id)) return fail(res, 'Заметка не найдена', 404);
   const n = parseNote(req.body);
-  if (!n.title) return fail(res, 'A note needs a TITLE.');
+  if (!n.title) return fail(res, 'У заметки должен быть ЗАГОЛОВОК.');
   db.prepare("UPDATE notes SET title = ?, body = ?, color = ?, pinned = ?, updated_at = datetime('now') WHERE id = ?").run(n.title, n.content, n.color, n.pinned, id);
   setTags(id, n.tags);
   res.json(getNote(id));
@@ -124,18 +129,18 @@ app.put('/api/notes/:id', (req, res) => {
 app.patch('/api/notes/:id/pin', (req, res) => {
   const id = Number(req.params.id);
   const r = db.prepare('UPDATE notes SET pinned = 1 - pinned WHERE id = ?').run(id);
-  if (!r.changes) return fail(res, 'Note not found', 404);
+  if (!r.changes) return fail(res, 'Заметка не найдена', 404);
   res.json(getNote(id));
 });
 
 app.delete('/api/notes/:id', (req, res) => {
   const r = db.prepare('DELETE FROM notes WHERE id = ?').run(Number(req.params.id));
-  if (!r.changes) return fail(res, 'Note not found', 404);
+  if (!r.changes) return fail(res, 'Заметка не найдена', 404);
   db.exec('DELETE FROM tags WHERE id NOT IN (SELECT tag_id FROM note_tags)');
   res.status(204).end();
 });
 
-app.use('/api', (req, res) => fail(res, 'Not found', 404));
-app.use((err, req, res, _next) => { console.error(err); fail(res, 'Server exploded. Try again.', 500); });
+app.use('/api', (req, res) => fail(res, 'Не найдено', 404));
+app.use((err, req, res, _next) => { console.error(err); fail(res, 'Сервер взорвался. Попробуйте ещё раз.', 500); });
 
 app.listen(PORT, () => console.log(`BRUTAL/NOTES → http://localhost:${PORT}`));

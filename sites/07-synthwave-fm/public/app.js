@@ -11,7 +11,7 @@ if (!visitor) { visitor = crypto.randomUUID(); try { localStorage.setItem('swfm-
 async function api(url, opts = {}) {
   const res = await fetch(url, { ...opts, headers: { 'Content-Type': 'application/json', 'X-Visitor': visitor } });
   const data = await res.json();
-  if (!res.ok) throw new Error(data.error || 'Request failed');
+  if (!res.ok) throw new Error(data.error || 'Ошибка запроса');
   return data;
 }
 function toast(msg) {
@@ -101,11 +101,11 @@ const cvs = $('#viz'), ctx = cvs.getContext('2d');
 // ---------- Now playing / schedule / requests ----------
 async function refreshNow() {
   const n = await api('/api/now');
-  $('#listeners').textContent = n.listeners.toLocaleString('en-US');
+  $('#listeners').textContent = n.listeners.toLocaleString('ru-RU');
   if (n.show) { $('#showTitle').textContent = n.show.title; $('#showHost').textContent = n.show.host; }
   if (playing) {
-    $('#trackLine').textContent = n.track ? `${n.track.artist} — ${n.track.title}` : 'Synthwave FM · Live generated mix';
-    $('#dedication').textContent = n.track?.dedication ? `“${n.track.dedication}” — ${n.track.requested_by}` : n.track ? `requested by ${n.track.requested_by}` : '';
+    $('#trackLine').textContent = n.track ? `${n.track.artist} — ${n.track.title}` : 'Synthwave FM · живой генеративный микс';
+    $('#dedication').textContent = n.track?.dedication ? `“${n.track.dedication}” — ${n.track.requested_by}` : n.track ? `по заявке ${n.track.requested_by}` : '';
   }
 }
 async function loadSchedule() {
@@ -134,11 +134,11 @@ $('#reqForm').addEventListener('submit', async (e) => {
   e.preventDefault();
   try {
     await api('/api/requests', { method: 'POST', body: JSON.stringify(Object.fromEntries(new FormData(e.target))) });
-    e.target.reset(); toast('📼 REQUEST RECEIVED!'); loadQueue(); refreshNow();
+    e.target.reset(); toast('📼 ЗАЯВКА ПРИНЯТА!'); loadQueue(); refreshNow();
   } catch (err) { toast(err.message); }
 });
 $('#djNext').onclick = async () => {
-  try { await api('/api/requests/next', { method: 'POST' }); toast('⏭ NEXT TRACK SPINNING'); loadQueue(); refreshNow(); }
+  try { await api('/api/requests/next', { method: 'POST' }); toast('⏭ СЛЕДУЮЩИЙ ТРЕК В ЭФИРЕ'); loadQueue(); refreshNow(); }
   catch (err) { toast(err.message); }
 };
 

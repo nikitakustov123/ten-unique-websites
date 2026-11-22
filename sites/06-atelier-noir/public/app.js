@@ -7,7 +7,7 @@ const el = (tag, props = {}, ...kids) => {
 async function api(url, opts = {}) {
   const res = await fetch(url, { headers: { 'Content-Type': 'application/json' }, ...opts });
   const data = await res.json();
-  if (!res.ok) throw new Error(data.error || 'Request failed');
+  if (!res.ok) throw new Error(data.error || 'Ошибка запроса');
   return data;
 }
 
@@ -60,7 +60,7 @@ async function loadCollections() {
     const track = el('div', { className: 'track' }, c.looks.map((l) => {
       const light = parseInt(l.tone.slice(1), 16) > 0x888888;
       const likeBtn = el('button', { className: 'like' }, el('span', { textContent: `♡ ${l.likes}` }));
-      likeBtn.dataset.cursor = 'Love';
+      likeBtn.dataset.cursor = 'Нравится';
       likeBtn.onclick = async () => {
         const r = await api(`/api/looks/${l.id}/like`, { method: 'POST' });
         likeBtn.firstChild.textContent = `♥ ${r.likes}`; likeBtn.classList.add('done');
@@ -68,7 +68,7 @@ async function loadCollections() {
       const frame = el('div', { className: 'frame reveal' }, el('div', { className: 'figure' }), el('span', { className: 'num', textContent: String(l.number).padStart(2, '0') }));
       frame.style.setProperty('--tone', l.tone);
       frame.style.setProperty('--fig', light ? '#1a1a1a' : '#e8e4dc');
-      frame.dataset.cursor = 'View';
+      frame.dataset.cursor = 'Смотреть';
       return el('article', { className: 'look' }, frame,
         el('div', { className: 'look-meta' }, el('div', {}, el('h3', { textContent: l.name }), el('small', { textContent: l.fabric })), likeBtn));
     }));
@@ -126,7 +126,7 @@ async function loadAvailability() {
     const dt = new Date(d.day + 'T12:00:00Z');
     const full = d.slots.every((s) => !s.free);
     const b = el('button', { type: 'button', className: `opt ${state.day === d.day ? 'on' : ''}`, disabled: full },
-      el('span', { className: 'dow', textContent: dt.toLocaleDateString('en-GB', { weekday: 'short', month: 'short', timeZone: 'UTC' }) }),
+      el('span', { className: 'dow', textContent: dt.toLocaleDateString('ru-RU', { weekday: 'short', month: 'short', timeZone: 'UTC' }) }),
       el('span', { className: 'dnum', textContent: dt.getUTCDate() }));
     b.onclick = () => { state.day = d.day; state.slot = null; pick($('#days'), b); renderSlots(); };
     return b;
@@ -146,12 +146,12 @@ function renderSlots() {
 $('#rdvForm').addEventListener('submit', async (e) => {
   e.preventDefault();
   const msg = $('#confirm');
-  if (!state.service || !state.day || !state.slot) { msg.textContent = 'Please choose a service, a date and an hour.'; return; }
+  if (!state.service || !state.day || !state.slot) { msg.textContent = 'Пожалуйста, выберите услугу, дату и время.'; return; }
   try {
     const f = Object.fromEntries(new FormData(e.target));
     const r = await api('/api/appointments', { method: 'POST', body: JSON.stringify({ ...f, service: state.service, day: state.day, slot: state.slot }) });
-    const when = new Date(r.day + 'T12:00:00Z').toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', timeZone: 'UTC' });
-    msg.textContent = `Merci, ${r.name}. We await you on ${when} at ${r.slot}.`;
+    const when = new Date(r.day + 'T12:00:00Z').toLocaleDateString('ru-RU', { weekday: 'long', day: 'numeric', month: 'long', timeZone: 'UTC' });
+    msg.textContent = `Merci, ${r.name}. Ждём вас: ${when}, в ${r.slot}.`;
     e.target.reset(); state.slot = null;
   } catch (err) { msg.textContent = err.message; }
   loadAvailability();
